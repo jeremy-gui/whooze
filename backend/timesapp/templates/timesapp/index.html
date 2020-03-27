@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Home</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="/timesapp/favicon.ico">
+      <!-- index.html -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <app-root>Loading...</app-root>
+  <!--{% if latest_parties_list %}
+  <ul>
+    {% for partie in latest_parties_list %}
+    <li><a href="/timesapp/{{ partie.id }}/">{{ partie.id }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Aucune partie</p>
+  {% endif %}-->
+
+  <script src="{% static 'timesapp/js/runtime-es2015.js' %}" type="module"></script>
+  <script src="{% static 'timesapp/js/runtime-es5.js' %}" nomodule defer></script>
+  <script src="{% static 'timesapp/js/polyfills-es5.js' %}" nomodule defer></script>
+  <script src="{% static 'timesapp/js/polyfills-es2015.js' %}" type="module"></script>
+  <script src="{% static 'timesapp/js/styles-es2015.js' %}" type="module"></script>
+  <script src="{% static 'timesapp/js/styles-es5.js' %}" nomodule defer></script>
+  <script src="{% static 'timesapp/js/vendor-es2015.js' %}" type="module"></script>
+  <script src="{% static 'timesapp/js/vendor-es5.js' %}" nomodule defer></script>
+  <script src="{% static 'timesapp/js/main-es2015.js' %}" type="module"></script>
+  <script src="{% static 'timesapp/js/main-es5.js' %}" nomodule defer></script>
+</body>
+</html>

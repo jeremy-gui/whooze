@@ -1,0 +1,6 @@
+<h1>Partie n°{{ partie.id }}, liste des joueurs : </h1>
+<ul>
+{% for a in partie.partieencours.all %}
+    <li>{{ a.nom }} dans l'équipe {{ a.equipe }}</li>
+{% endfor %}
+</ul>
