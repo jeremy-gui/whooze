@@ -3,16 +3,18 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl:  './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'Time\'s up';
+  title = 'Time\'s uup';
   constructor(private _http: HttpClient) {
-    //this.c1.name = 'eli';
   }
 
+  connected = false;
+
   c1: Cust = new Cust();
+
   click1() {
     this.getBooks().subscribe(b => this.c1.name = b.toString());
   }
