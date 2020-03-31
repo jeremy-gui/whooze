@@ -7,11 +7,10 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'Time\'s uup';
   constructor(private _http: HttpClient) {
   }
-
-  connected = false;
+  title = "Whooze";
+  isAuth = false;
 
   c1: Cust = new Cust();
 

@@ -1,0 +1,32 @@
+
+        <section>
+
+          <form class="text-center border border-light p-5" name="registerForm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+            <p class="h4 mb-4">Sign up</p>
+
+            <input type="text" formControlName="username" name="Username" id="defaultRegisterFormUsername" class="form-control mb-4" placeholder="Username"required >
+
+            <input type="email" formControlName="email" name="Email" id="defaultRegisterFormEmail" class="form-control mb-4" placeholder="E-mail" required >
+
+            <input type="password" formControlName="password" ng-minlength="6" name="Password" id="defaultRegisterFormPassword" class="form-control" placeholder="Password" aria-describedby="defaultRegisterFormPasswordHelpBlock" required >
+
+            <small id="defaultRegisterFormPasswordHelpBlock" class="form-text text-muted mb-4">
+              At least 8 characters and 1 digit
+            </small>
+            <input type="password"   formControlName="ConfirmPassword" name="ConfirmPassword"  id="defaultRegisterFormConfirmPassword" class="form-control  mb-4" placeholder="Confirm password" aria-describedby="defaultRegisterFormConfirmPasswordHelpBlock" required  >
+            <label  class="text-danger" *ngIf="registerForm.controls['ConfirmPassword'].hasError('NoPassswordMatch')" >
+              Password do not match
+            </label>
+
+            <button class="btn btn-primary btn-block mb-4" type="submit">Sign in</button>
+
+
+            <hr>
+
+            <!-- Terms of service -->
+           </form>
+          <!-- Default form register -->
+
+        </section>
+        <!--Section: Live preview-->
