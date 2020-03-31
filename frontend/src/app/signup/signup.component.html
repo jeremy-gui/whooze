@@ -1,27 +1,60 @@
 
         <section>
 
-          <form class="text-center border border-light p-5" name="registerForm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <form class="text-center border border-light p-5" name="registerForm" [formGroup]="registerForm" (submit)="submit()">
 
             <p class="h4 mb-4">Sign up</p>
 
-            <input type="text" formControlName="username" name="Username" id="defaultRegisterFormUsername" class="form-control mb-4" placeholder="Username"required >
 
-            <input type="email" formControlName="email" name="Email" id="defaultRegisterFormEmail" class="form-control mb-4" placeholder="E-mail" required >
+            <input id="username" formControlName="username" type="username" class="form-control mb-4" placeholder="Username" [ngClass]="registerForm.controls['username'].invalid ? 'is-invalid' : ''">
+            <label
+              class="text-danger"
+              *ngIf="registerForm.controls['username'].hasError('required')"
+            >
+              Username is required!
+            </label>
+            <label
+              class="text-danger"
+              *ngIf="registerForm.controls['username'].hasError('minlength')"
+            >
+              Enter a valid username (min. 3 characters)!
+            </label>
+            <input id="email" formControlName="email" type="email" class="form-control mb-4" placeholder="E-mail" [ngClass]="registerForm.controls['email'].invalid ? 'is-invalid' : ''">
+            <label class="text-danger" *ngIf="registerForm.controls['email'].hasError('required')">
+              Email is Required!
+            </label>
 
-            <input type="password" formControlName="password" ng-minlength="6" name="Password" id="defaultRegisterFormPassword" class="form-control" placeholder="Password" aria-describedby="defaultRegisterFormPasswordHelpBlock" required >
+            <label
+              class="text-danger"
+              *ngIf="registerForm.controls['email'].hasError('email')"
+            >
+              Enter a valid email address!
+            </label>
 
-            <small id="defaultRegisterFormPasswordHelpBlock" class="form-text text-muted mb-4">
-              At least 8 characters and 1 digit
-            </small>
-            <input type="password"   formControlName="ConfirmPassword" name="ConfirmPassword"  id="defaultRegisterFormConfirmPassword" class="form-control  mb-4" placeholder="Confirm password" aria-describedby="defaultRegisterFormConfirmPasswordHelpBlock" required  >
-            <label  class="text-danger" *ngIf="registerForm.controls['ConfirmPassword'].hasError('NoPassswordMatch')" >
+            <input type="password" formControlName="password" ng-minlength="6" name="password" id="defaultRegisterFormPassword" class="form-control mb-4" placeholder="Password" aria-describedby="defaultRegisterFormPasswordHelpBlock" required  [ngClass]="registerForm.controls['password'].invalid ? 'is-invalid' : ''" >
+            <label class="col" [ngClass]="registerForm.controls['password'].hasError('required') || registerForm.controls['password'].hasError('minlength')  ? 'text-danger' : 'text-success'">
+              <i class="material-icons">{{ registerForm.controls['password'].hasError('required') ||
+              registerForm.controls['password'].hasError('minlength') ? 'cancel' :
+                'check_circle' }}</i>
+              Must be at least 8 characters!
+            </label>
+            <label class="col" [ngClass]="registerForm.controls['password'].hasError('required') || registerForm.controls['password'].hasError('hasNumber')  ? 'text-danger' : 'text-success'">
+              <i class="material-icons">{{ registerForm.controls['password'].hasError('required') ||
+              registerForm.controls['password'].hasError('hasNumber') ? 'cancel' :
+                'check_circle' }}</i>
+              Must contain at least 1 number!
+            </label>
+
+            <input placeholder="Confirm password" id="confirmPassword" formControlName="confirmPassword" type="password" class="form-control mb-4"
+                   [ngClass]="registerForm.controls['confirmPassword'].invalid ? 'is-invalid' : ''">
+            <label class="text-danger" *ngIf="registerForm.controls['confirmPassword'].hasError('required')">
+              Password is Required!
+            </label>
+            <label class="text-danger" *ngIf="registerForm.controls['confirmPassword'].hasError('NoPassswordMatch')">
               Password do not match
             </label>
 
-            <button class="btn btn-primary btn-block mb-4" type="submit">Sign in</button>
-
-
+            <button [disabled]="registerForm.invalid" type="submit" class="btn btn-primary btn-block mb-4">Sign-up</button>
             <hr>
 
             <!-- Terms of service -->

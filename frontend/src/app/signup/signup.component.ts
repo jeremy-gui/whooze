@@ -8,27 +8,43 @@ import {CustomValidators} from '../custom-validators';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit {
-  registerForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder) { }
 
-  onSubmit() {
+  public registerForm: FormGroup;
+
+  ngOnInit(): void {
+    this.registerForm = this.formBuilder.group({
+      username: [null, Validators.compose([
+      Validators.minLength(3),
+      Validators.maxLength(20),
+      Validators.required])
+    ],
+      email: [null, Validators.compose([
+        Validators.email,
+        Validators.required])
+      ],
+      password: [null, Validators.compose([
+        Validators.required,
+        CustomValidators.patternValidator(/\d/, { hasNumber: true }),
+        Validators.minLength(8)])
+  ],
+    confirmPassword: [null, Validators.compose([Validators.required])]
+  },
+    {
+      // check whether our password and confirm password match
+      validator: CustomValidators.passwordMatchValidator
+    });
+
+  }
+
+  submit() {
     if (this.registerForm.valid) {
       alert('User form is valid!!');
     } else {
       alert('User form is not valid!!');
     }
   }
-
-  ngOnInit(): void {
-    this.registerForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+$')]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required, CustomValidators.passwordMatchValidator]],
-    });
-
-  }
-
-
 }
+
+
