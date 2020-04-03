@@ -1,4 +1,4 @@
-<form class="form login" role="form">
+<form class="form login" role="form" [formGroup]="loginForm" (ngSubmit)="update()">
   <div class="form-group">
     <input id="emailInput" placeholder="Email" class="form-control form-control-sm" type="text" required="">
   </div>

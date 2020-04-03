@@ -8,16 +8,12 @@ import {CustomValidators} from '../custom-validators';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit {
+  registerForm: FormGroup;
+  submitted = false;
 
   constructor(private formBuilder: FormBuilder) { }
 
-  public registerForm: FormGroup;
-
   ngOnInit(): void {
-
-  }
-
-  submit() {
     this.registerForm = this.formBuilder.group({
         username: [null, Validators.compose([
           Validators.minLength(3),
@@ -31,7 +27,7 @@ export class SignupComponent implements OnInit {
         password: [null, Validators.compose([
           Validators.required,
           CustomValidators.patternValidator(/\d/, { hasNumber: true }),
-          Validators.minLength(8)])
+          Validators.minLength(6)])
         ],
         confirmPassword: [null, Validators.compose([Validators.required])]
       },
@@ -40,6 +36,20 @@ export class SignupComponent implements OnInit {
         validator: CustomValidators.passwordMatchValidator
       });
   }
+// convenience getter for easy access to form fields
+  get f() { return this.registerForm.controls; }
+
+  onSubmit() {
+    this.submitted = true;
+
+    // stop here if form is invalid
+    if (this.registerForm.invalid) {
+      return;
+    }
+    // display form values on success
+    alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.registerForm.value, null, 4));
+  }
+
 }
 
 
