@@ -60,10 +60,11 @@ class UserDetail(generics.RetrieveAPIView):
     serializer_class = userSerializer
 
 
-class HomePageView(TemplateView):
-    def get(self, request, **kwargs):
-        return render(request, 'timesapp/index.html', context=None)
-
+def index(request, path=''):
+    """
+    The home page. This renders the container for the single-page app.
+    """
+    return render(request, 'index.html')
 
 class LinksPageView(TemplateView):
     def get(self, request, **kwargs):
