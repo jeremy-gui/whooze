@@ -11,6 +11,8 @@ import { Subscription } from 'rxjs';
 })
 export class HomeComponent implements OnInit {
 
+  message: string;
+
   constructor(
     public _userService: UserService
   ) { }

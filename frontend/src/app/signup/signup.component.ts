@@ -3,6 +3,9 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {CustomValidators} from '../utils/custom-validators';
 import {environment} from '../../environments/environment';
+import {UserService} from '../services/user.service';
+import {User} from '../models/user';
+import {GlobalService} from '../services/global.service';
 
 @Component({
   selector: 'app-signup',
@@ -14,10 +17,12 @@ export class SignupComponent implements OnInit {
   registerForm: FormGroup;
   submitted = false;
   title: string;
+  user: User;
 
-  constructor(private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder, private global: GlobalService, public _userService: UserService, private router: Router) { }
 
   ngOnInit(): void {
+    this.user = new User();
     this.title = environment.title;
     this.registerForm = this.formBuilder.group({
    /*     username: [null, Validators.compose([
@@ -50,6 +55,21 @@ export class SignupComponent implements OnInit {
     // stop here if form is invalid
     if (this.registerForm.invalid) {
       return;
+    } else {
+      this.user = new User(this.registerForm.value);
+      this._userService.createUserThenConnect(this.user).subscribe (
+        data => {
+          this.user = data.user;
+          localStorage.setItem('token', data.token);
+          this.global.me = data.user;
+          this._userService.connected = true;
+          this.router.navigate(['/'],{ state: {data: {"registerOk" : true}}});
+         },
+        error => {
+          console.log(error);
+          return;
+        }
+      );
     }
   }
 

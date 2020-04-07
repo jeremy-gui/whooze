@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {User} from '../models/user';
 import {environment} from '../../environments/environment';
+import {mergeMap} from 'rxjs/operators';
 
 
 @Injectable()
@@ -36,9 +37,11 @@ export class UserService {
 
   // Uses http.post() to get an auth token from djangorestframework-jwt endpoint
   public login(user) {
+    console.log('login:');
+    console.log(user);
     this.http.post(`${this.baseUrl}api-token-auth/`, JSON.stringify(user), this.httpOptions).subscribe(
       data => {
-        console.log(data);
+        // console.log(data);
         this.updateData(data['token']);
         this.connected = true;
       },
@@ -52,7 +55,7 @@ export class UserService {
   public refreshToken() {
     this.http.post(`${this.baseUrl}api-token-refresh/`, JSON.stringify({token: this.token}), this.httpOptions).subscribe(
       data => {
-        console.log(data);
+        // console.log(data);
         this.updateData(data['token']);
         this.connected = true;
       },
@@ -72,6 +75,21 @@ export class UserService {
     this.connected = false;
   }
 
+  createUser(user: any): Observable<any> {
+    console.log('create user inside:');
+    console.log(user);
+    return this.http.post(`${this.baseUrl}timesapp/users/create`, JSON.stringify({ user}), this.httpOptions);
+  }
+
+  createUserThenConnect(user: User): Observable<any> {
+        return this.createUser(user).pipe(
+          mergeMap((datasucces) => {
+            console.log(datasucces);
+            console.log(user);
+            return this.loginUser(user);
+          })
+        );
+  }
   private updateData(token) {
     this.token = token;
     this.errors = [];
@@ -85,6 +103,8 @@ export class UserService {
 
   loginUser(userData: any): Observable<any> {
     const url = `${this.baseUrl}api-token-auth/`;
+    console.log('loginuser inside:');
+    console.log(userData);
     return this.http.post(url, userData, {headers: this.httpHeaders});
   }
 

@@ -11,7 +11,7 @@
               <div *ngIf="f.username.errors.minlength">Username must be at least 3 characters</div>
               <div *ngIf="f.username.errors.maxlength">Username must be a maximum of 20 characters</div>
             </div>-->
-            <input type="text" placeholder="E-mail" formControlName="email" class="form-control mb-4" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
+            <input  type="text" placeholder="E-mail" formControlName="email" class="form-control mb-4" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
             <div *ngIf="submitted && f.email.errors" class="invalid-feedback mb-4">
               <div *ngIf="f.email.errors.required">Email is required</div>
               <div *ngIf="f.email.errors.email">Email must be a valid email address</div>

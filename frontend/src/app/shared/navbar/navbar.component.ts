@@ -14,7 +14,7 @@ export class NavbarComponent implements OnInit {
   account: User = new User();
   userSub: Subscription;
   title = environment.title;
-
+  message: string;
 
   constructor(
     private router: Router,
@@ -23,6 +23,10 @@ export class NavbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.message = "a";
+    if (history.state.data && history.state.data['registerOk'] || this.message)    {
+      this.message = "Thank you for suscribing ! Now let's play tooooo ";
+    }
     if (!localStorage.getItem('token') || !localStorage.getItem('account')) {
       this._userService.connected = false;
       this.router.navigate(['/']);
