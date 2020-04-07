@@ -1,16 +1,16 @@
-
+<h1 class="text-center">{{title}}</h1>
         <section>
 
           <form class="text-center border border-light p-5" [formGroup]="registerForm" name="registerForm" (ngSubmit)="onSubmit()">
 
             <p class="h4 mb-4">Sign up</p>
 
-            <input type="text" placeholder="Username" formControlName="username" class="form-control mb-4" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
+          <!--  <input type="text" placeholder="Username" formControlName="username" class="form-control mb-4" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
             <div *ngIf="submitted && f.username.errors" class="invalid-feedback mb-4">
               <div *ngIf="f.username.errors.required">Username is required</div>
               <div *ngIf="f.username.errors.minlength">Username must be at least 3 characters</div>
               <div *ngIf="f.username.errors.maxlength">Username must be a maximum of 20 characters</div>
-            </div>
+            </div>-->
             <input type="text" placeholder="E-mail" formControlName="email" class="form-control mb-4" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
             <div *ngIf="submitted && f.email.errors" class="invalid-feedback mb-4">
               <div *ngIf="f.email.errors.required">Email is required</div>

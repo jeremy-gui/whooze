@@ -1,3 +1,6 @@
-
-<button routerLink="auth" type="button" class="btn btn-primary btn-block">Login</button>
-<button routerLink="signup" type="button" class="btn btn-primary btn-block">Sign-up</button>
+<div *ngIf="!_userService.connected">
+  <div>
+  <button routerLink="login" type="button" class="btn btn-primary btn-block">Login</button>
+  <button routerLink="signup" type="button" class="btn btn-primary btn-block">Sign-up</button>
+  </div>
+</div>

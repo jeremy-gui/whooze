@@ -1,25 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {CustomValidators} from '../custom-validators';
+import {Router} from '@angular/router';
+import {CustomValidators} from '../utils/custom-validators';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
+
 export class SignupComponent implements OnInit {
   registerForm: FormGroup;
   submitted = false;
+  title: string;
 
   constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
+    this.title = environment.title;
     this.registerForm = this.formBuilder.group({
-        username: [null, Validators.compose([
+   /*     username: [null, Validators.compose([
           Validators.minLength(3),
           Validators.maxLength(20),
           Validators.required])
-        ],
+        ],*/
         email: [null, Validators.compose([
           Validators.email,
           Validators.required])
@@ -46,8 +51,6 @@ export class SignupComponent implements OnInit {
     if (this.registerForm.invalid) {
       return;
     }
-    // display form values on success
-    alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.registerForm.value, null, 4));
   }
 
 }

@@ -1,0 +1,17 @@
+@import "../static/fonts/fonts.scss";
+
+@font-face {
+  font-family: $font-family-brand;
+  src: url($badabb-text-regular-font-path-woff2) format('woff2'),
+  url($badabb-text-regular-font-path-woff) format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: $font-family-brand;
+}
+
+h1 {
+  font-size: 8em;
+}

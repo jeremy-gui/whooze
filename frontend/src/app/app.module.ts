@@ -1,38 +1,36 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {ErrorHandler, NgModule} from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
-import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { HomeComponent } from './home/home.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+
+import { UserService, GlobalService } from './services/services.index';
+
+//components
+import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
-import {RouterModule, Routes} from '@angular/router';
-import { SignupComponent } from './signup/signup.component';
-import {ReactiveFormsModule} from '@angular/forms';
+import { SignupComponent} from './signup/signup.component';
+import { MainModule } from './main/main.module';
 
-
-const appRoutes: Routes = [
-  { path: 'auth', component: LoginComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'signup', component: SignupComponent },
-  { path: '', component: HomeComponent }
-];
+import { APP_ROUTING } from './app.routes';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
     LoginComponent,
     SignupComponent
   ],
   imports: [
     HttpClientModule,
     BrowserModule,
+    FormsModule,
     NgbModule,
-    RouterModule.forRoot(appRoutes),
-    ReactiveFormsModule
+    APP_ROUTING,
+    ReactiveFormsModule,
+    MainModule
   ],
-  providers: [],
+  providers: [UserService, GlobalService],
   bootstrap: [AppComponent],
 })
 
