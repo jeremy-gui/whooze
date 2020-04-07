@@ -1,10 +1,10 @@
-{% extends "timesapp/base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
-  <app-root>Loading...</app-root>
 
-  <script src="{% static 'front-end/angular/scripts.js' %}" type="module"></script>
+  <app-root>Loading the app...</app-root>
+
   <script src="{% static 'front-end/angular/runtime-es2015.js' %}" type="module"></script>
   <script src="{% static 'front-end/angular/runtime-es5.js' %}" nomodule defer></script>
   <script src="{% static 'front-end/angular/polyfills-es5.js' %}" nomodule defer></script>
@@ -15,6 +15,5 @@
   <script src="{% static 'front-end/angular/vendor-es5.js' %}" nomodule defer></script>
   <script src="{% static 'front-end/angular/main-es2015.js' %}" type="module"></script>
   <script src="{% static 'front-end/angular/main-es5.js' %}" nomodule defer></script>
-
 
 {% endblock %}

@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'timesapp.apps.TimesappConfig',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,6 +86,9 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'timesapp.User'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -143,4 +148,8 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': timedelta(0, 3600, 0, 0, 0, 0, 0),
+    'JWT_RESPONSE_PAYLOAD_HANDLER':   'timesapp.utils.custom_jwt_response_handler',
 }
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
