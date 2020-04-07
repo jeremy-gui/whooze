@@ -85,7 +85,7 @@ class CreateUserView(APIView):
     def post(self,request):
         user = request.data.get('user')
         if not user:
-            return Response({'response' : 'error', 'message' : 'No data found'})
+            return Response({'response' : 'error', 'message' : 'No data found blob'})
         serializer = UserSerializerWithToken(data=user)
         if serializer.is_valid():
             saved_user = serializer.save()
