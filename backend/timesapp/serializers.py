@@ -14,7 +14,8 @@ class userSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'parties', 'joueurs']
 
 class partieSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.email')
+    owner = userSerializer(many=False, read_only=True)
+    owner_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Partie
@@ -22,7 +23,8 @@ class partieSerializer(serializers.ModelSerializer):
 
 
 class joueurSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.email')
+    owner = userSerializer(many=False, read_only=True)
+    owner_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Joueur

@@ -147,7 +147,7 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': timedelta(0, 3600, 0, 0, 0, 0, 0),
+    'JWT_EXPIRATION_DELTA': timedelta(days=7),
     'JWT_RESPONSE_PAYLOAD_HANDLER':   'timesapp.utils.custom_jwt_response_handler',
 }
 

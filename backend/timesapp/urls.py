@@ -20,6 +20,7 @@ urlpatterns = [
     path(r'api/', include(router.urls)),
     path(r'current_user/', timesapp.get_current_user),
     path(r'users/create', timesapp.CreateUserView.as_view()),
+    path(r'joueur/create', timesapp.CreateJoueurView.as_view()),
     path(r'', views.index, name='index')
 ]
 urlpatterns += [

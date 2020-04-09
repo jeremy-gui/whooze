@@ -66,6 +66,8 @@ class User(AbstractUser):
 
     username = None
     email = models.EmailField('email', unique=True)
+    parties = None
+    joueurs = None
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -76,7 +78,7 @@ class User(AbstractUser):
 class Partie(models.Model):
     stadePartieEnCours = models.IntegerField(default=0)  # 0 = non lance, 1 = choix des noms perso,...
     listePersonnages = models.ManyToManyField(Personnage, related_name='personnages')
-    # TODO: verifier utilisateur class
+
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='parties', blank=True, null=True, on_delete=models.SET_NULL)
     linenos = models.BooleanField(default=False)
     language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
@@ -97,12 +99,26 @@ class Partie(models.Model):
 
 
 class Joueur(models.Model):
-    nom = models.CharField(max_length=200)
+    username = models.CharField(max_length=200)
     partiencours = models.ForeignKey(Partie, related_name='partieencours', blank=True, null=True, on_delete=models.SET_NULL)
     equipe = models.ForeignKey(Equipe, related_name='equipe', blank=True, null=True, on_delete=models.SET_NULL)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='joueurs', blank=True, null=True, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return self.nom
+        return self.username
+
+class JoueurManager():
+
+    def _create_joueur(self, username, owner, **extra_fields):
+        """Create and save a Joueur with the given username and owner."""
+        if not username:
+            raise ValueError('The given username must be set')
+        joueur = self.model(username=username, **extra_fields)
+        joueur.owner = self.model(owner=owner, **extra_fields)
+        joueur.save(using=self._db)
+        return joueur
 
 
+    def create_joueur(self, username, owner=None, **extra_fields):
+
+        return self._create_user(username, owner, **extra_fields)

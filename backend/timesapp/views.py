@@ -97,19 +97,15 @@ class LinksPageView(TemplateView):
     def get(self, request, **kwargs):
         return render(request, 'timesapp/links.html', context=None)
 
-
-class Customers(TemplateView):
-    def getCust(request):
-        name = 'liran'
-        return HttpResponse('{ "name":"' + name + '", "age":31, "city":"New York" }')
-
-
-
-@api_view(["POST"])
-def CalcTest(x1):
-    try:
-        x = json.loads(x1.body)
-        y = str(x * 100)
-        return JsonResponse("Result:" + y, safe=False)
-    except ValueError as e:
-        return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
+class CreateJoueurView(APIView):
+    permission_classes = (permissions.AllowAny, )
+    def post(self,request):
+        joueur = request.data.get('joueur')
+        if not joueur:
+            return Response({'response' : 'error', 'message' : 'No data found blob'})
+        serializer = joueurSerializer(data=joueur)
+        if serializer.is_valid():
+            saved_joueur = serializer.save()
+        else:
+            return Response({"response" : "error", "message" : serializer.errors})
+        return Response(serializer.data)
