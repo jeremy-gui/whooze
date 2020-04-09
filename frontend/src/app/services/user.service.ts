@@ -16,7 +16,7 @@ export class UserService {
   public token: string;
 
   // the token expiration date
-  public token_expires: Date;
+  public token_expires: number;
 
   // the email of the logged in user
   public email: string;
@@ -66,6 +66,22 @@ export class UserService {
     );
   }
 
+   verifyToken(token: any): any {
+    this.http.post(`${this.baseUrl}api-token-verify/`, JSON.stringify({'token': token}), this.httpOptions).subscribe(
+      data => {
+        // console.log(data);
+        this.updateData(data['token']);
+        this.connected = true;
+        return true;
+      },
+      err => {
+        this.errors = err.error;
+        this.connected = false;
+        return false;
+      }
+    );
+  }
+
   public logout() {
     this.token = null;
     this.token_expires = null;
@@ -76,35 +92,29 @@ export class UserService {
   }
 
   createUser(user: any): Observable<any> {
-    console.log('create user inside:');
-    console.log(user);
-    return this.http.post(`${this.baseUrl}timesapp/users/create`, JSON.stringify({ user}), this.httpOptions);
+       return this.http.post(`${this.baseUrl}timesapp/users/create`, JSON.stringify({ user }), this.httpOptions);
   }
 
   createUserThenConnect(user: User): Observable<any> {
         return this.createUser(user).pipe(
           mergeMap((datasucces) => {
-            console.log(datasucces);
-            console.log(user);
             return this.loginUser(user);
           })
         );
   }
-  private updateData(token) {
+  public updateData(token) {
     this.token = token;
     this.errors = [];
 
     // decode the token to read the username and expiration timestamp
     const token_parts = this.token.split(/\./);
     const token_decoded = JSON.parse(window.atob(token_parts[1]));
-    this.token_expires = new Date(token_decoded.exp * 1000);
+    this.token_expires = token_decoded.exp * 1000;
     this.email = token_decoded.email;
   }
 
   loginUser(userData: any): Observable<any> {
     const url = `${this.baseUrl}api-token-auth/`;
-    console.log('loginuser inside:');
-    console.log(userData);
     return this.http.post(url, userData, {headers: this.httpHeaders});
   }
 

@@ -2,11 +2,13 @@ import {LoginComponent} from './login/login.component';
 import {RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './home/home.component';
 import {SignupComponent} from './signup/signup.component';
+import {ChooseusernameComponent} from './chooseusername/chooseusername.component';
 
 const APP_ROUTES: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent },
   { path: 'signup', component: SignupComponent },
+  { path: 'chooseusername', component: ChooseusernameComponent },
   { path: '', component: HomeComponent }
 ];
 

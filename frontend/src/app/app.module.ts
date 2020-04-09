@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import { UserService, GlobalService } from './services/services.index';
+import {UserService, GlobalService, JoueurService} from './services/services.index';
 
 //components
 import { AppComponent } from './app.component';
@@ -14,6 +14,7 @@ import { SignupComponent} from './signup/signup.component';
 import { MainModule } from './main/main.module';
 
 import { APP_ROUTING } from './app.routes';
+import { ChooseusernameComponent } from './chooseusername/chooseusername.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,7 @@ import { APP_ROUTING } from './app.routes';
     ReactiveFormsModule,
     MainModule
   ],
-  providers: [UserService, GlobalService],
+  providers: [UserService, GlobalService, JoueurService],
   bootstrap: [AppComponent],
 })
 
