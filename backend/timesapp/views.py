@@ -98,7 +98,7 @@ class LinksPageView(TemplateView):
         return render(request, 'timesapp/links.html', context=None)
 
 class CreateJoueurView(APIView):
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.IsAuthenticated, )
     def post(self,request):
         joueur = request.data.get('joueur')
         if not joueur:
@@ -106,6 +106,20 @@ class CreateJoueurView(APIView):
         serializer = joueurSerializer(data=joueur)
         if serializer.is_valid():
             saved_joueur = serializer.save()
+        else:
+            return Response({"response" : "error", "message" : serializer.errors})
+        return Response(serializer.data)
+
+
+class CreatePartieView(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    def post(self,request):
+        partie = request.data.get('partie')
+        if not partie:
+            return Response({'response' : 'error', 'message' : 'No data found blob'})
+        serializer = partieSerializer(data=partie)
+        if serializer.is_valid():
+            saved_partie = serializer.save()
         else:
             return Response({"response" : "error", "message" : serializer.errors})
         return Response(serializer.data)

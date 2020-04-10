@@ -149,6 +149,7 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': timedelta(days=7),
     'JWT_RESPONSE_PAYLOAD_HANDLER':   'timesapp.utils.custom_jwt_response_handler',
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 
 LOGIN_URL = 'login'

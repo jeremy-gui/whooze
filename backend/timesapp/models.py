@@ -77,35 +77,32 @@ class User(AbstractUser):
 
 class Partie(models.Model):
     stadePartieEnCours = models.IntegerField(default=0)  # 0 = non lance, 1 = choix des noms perso,...
-    listePersonnages = models.ManyToManyField(Personnage, related_name='personnages')
-
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='parties', blank=True, null=True, on_delete=models.SET_NULL)
-    linenos = models.BooleanField(default=False)
-    language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
-    style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
-    highlighted = models.TextField(default='here')
-
-    def save(self, *args, **kwargs):
-        lexer = get_lexer_by_name(self.language)
-        linenos = 'table' if self.linenos else False
-        options = {'stadePartieEnCours': self.stadePartieEnCours} if self.stadePartieEnCours else {}
-        formatter = HtmlFormatter(style=self.style, linenos=linenos,
-                                  full=True, **options)
-        self.highlighted = highlight(self.code, lexer, formatter)
-        super(Partie, self).save(*args, **kwargs)
+    listePersonnages = models.ManyToManyField(Personnage, related_name='personnages', blank=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='partieowner', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return str(self.id)
 
+class PartieManager():
+
+    def _create_partie(self, stadePartieEnCours, owner, **extra_fields):
+
+        if not owner:
+            raise ValueError('The given owner must be set')
+        partie = self.model(stadePartieEnCours=stadePartieEnCours, **extra_fields)
+        partie.owner = self.model(partieowner=owner, **extra_fields)
+        partie.save(using=self._db)
+        return partie
+
 
 class Joueur(models.Model):
     username = models.CharField(max_length=200)
-    partiencours = models.ForeignKey(Partie, related_name='partieencours', blank=True, null=True, on_delete=models.SET_NULL)
+    partiencours = models.ForeignKey(Partie, related_name='partie', blank=True, null=True, on_delete=models.SET_NULL)
     equipe = models.ForeignKey(Equipe, related_name='equipe', blank=True, null=True, on_delete=models.SET_NULL)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return self.username
+        return str(self.id)
 
 class JoueurManager():
 
