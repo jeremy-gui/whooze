@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import {ErrorHandler, NgModule} from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -15,6 +15,9 @@ import { MainModule } from './main/main.module';
 
 import { APP_ROUTING } from './app.routes';
 import { ChooseusernameComponent } from './chooseusername/chooseusername.component';
+import { CreateorjoinpartieComponent } from './createorjoinpartie/createorjoinpartie.component';
+import {TokenInterceptor} from './services/token-interceptor';
+import {PartieService} from './services/partie.service';
 
 @NgModule({
   declarations: [
@@ -31,7 +34,7 @@ import { ChooseusernameComponent } from './chooseusername/chooseusername.compone
     ReactiveFormsModule,
     MainModule
   ],
-  providers: [UserService, GlobalService, JoueurService],
+  providers: [UserService, GlobalService, JoueurService, PartieService, { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })
 

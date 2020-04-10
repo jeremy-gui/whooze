@@ -25,8 +25,7 @@ export class ChooseusernameComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if(history.state.data && history.state.data.creategame)
-    {
+    if (history.state.data && history.state.data.creategame) {
       this.nextPage = "creategame";
     }
     if (localStorage.getItem('token') || localStorage.getItem('account')) {
@@ -58,6 +57,7 @@ export class ChooseusernameComponent implements OnInit {
           this.joueur = data.joueur;
           localStorage.setItem('joueur', JSON.stringify(data));
           this._joueurService.joueurCreated = true;
+          this.router.navigate(['creategame'], { state: {data: {"creator" : true}}});
         },
         error => {
           console.log(error);

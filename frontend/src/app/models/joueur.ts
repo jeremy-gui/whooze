@@ -1,5 +1,3 @@
-import {User} from './user';
-
 export class Joueur {
   public constructor(init?: Partial<Joueur>) {
     Object.assign(this, init);

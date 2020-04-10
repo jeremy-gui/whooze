@@ -32,16 +32,17 @@ export class NavbarComponent implements OnInit {
 
     if (history.state.data && history.state.data.registerOk)    {
       this.message = 'Thank you for suscribing ! Now let\'s play tooooo ';
+      history.state.data.registerOk.delete();
     }
     if (!localStorage.getItem('token') || !localStorage.getItem('account')) {
       this._userService.connected = false;
       this.router.navigate(['/']);
       } else if (localStorage.getItem('token') || localStorage.getItem('account')) {
 
-      //on verifie d'abord que le token n'est pas sur le point d'expirer (dans les 3 jours)
+      // on verifie d'abord que le token n'est pas sur le point d'expirer (dans les 3 jours)
       this._userService.updateData(localStorage.getItem('token'));
-      let date1: number = Date.now();
-      let diffDate: number = this._userService.token_expires - date1;
+      const date1: number = Date.now();
+      const diffDate: number = this._userService.token_expires - date1;
 
       if (diffDate <= 259200000) {
         if (this._userService.verifyToken(localStorage.getItem('token'))) {
@@ -50,12 +51,10 @@ export class NavbarComponent implements OnInit {
           );
           this._userService.connected = true;
           this.global.me = JSON.parse(localStorage.getItem('account'));
-        }
-        else {
+        } else {
           this.logout();
         }
-      }
-      else if (diffDate > 259200000) {
+      } else if (diffDate > 259200000) {
         this.userSub = this.global.user.subscribe(
           me => this.account = me
         );
@@ -63,7 +62,7 @@ export class NavbarComponent implements OnInit {
         this.global.me = JSON.parse(localStorage.getItem('account'));
       }
     }
-      if (!localStorage.getItem('joueur')) {
+    if (!localStorage.getItem('joueur')) {
         this._joueurService.joueurCreated = false;
         this.router.navigate(['/']);
       } else if (localStorage.getItem('joueur'))  {
