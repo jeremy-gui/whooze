@@ -2,11 +2,12 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import action, api_view
 from rest_framework import status, permissions
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.utils import json
 from rest_framework.viewsets import ModelViewSet
 
 from timesapp.permissions import IsOwnerOrReadOnly
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
 from django.views.generic import TemplateView
 from rest_framework.views import APIView
@@ -15,7 +16,7 @@ from rest_framework import generics
 from django.shortcuts import render
 
 from .models import Partie, Joueur, Equipe, Personnage, User
-from .serializers import partieSerializer, joueurSerializer, userSerializer, UserSerializerWithToken
+from .serializers import partieSerializer, joueurSerializer, userSerializer, UserSerializerWithToken, equipeSerializer
 
 
 def index(request, path=''):
@@ -33,8 +34,7 @@ class HomePageView(TemplateView):
 class Parties(ModelViewSet):
     queryset = Partie.objects.all()
     serializer_class = partieSerializer
-    permission_classes = [permissions.IsAuthenticated,
-                          IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -63,7 +63,19 @@ class JoueurDetail(ModelViewSet):
                           IsOwnerOrReadOnly]
 
 
-"""generics.ListAPIView"""
+class Equipes(ModelViewSet):
+    queryset = Equipe.objects.all()
+    serializer_class = equipeSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class EquipeDetail(ModelViewSet):
+    queryset = Equipe.objects.all()
+    serializer_class = equipeSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class UserList(ModelViewSet):
@@ -93,10 +105,6 @@ class CreateUserView(APIView):
             return Response({"response" : "error", "message" : serializer.errors})
         return Response({"response" : "success", "message" : "user created succesfully"})
 
-class LinksPageView(TemplateView):
-    def get(self, request, **kwargs):
-        return render(request, 'timesapp/links.html', context=None)
-
 class CreateJoueurView(APIView):
     permission_classes = (permissions.IsAuthenticated, )
     def post(self,request):
@@ -110,16 +118,58 @@ class CreateJoueurView(APIView):
             return Response({"response" : "error", "message" : serializer.errors})
         return Response(serializer.data)
 
+class UpdateJoueurView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Joueur.objects.all()
+    serializer_class = joueurSerializer
+
 
 class CreatePartieView(APIView):
     permission_classes = (permissions.IsAuthenticated, )
     def post(self,request):
         partie = request.data.get('partie')
+
         if not partie:
             return Response({'response' : 'error', 'message' : 'No data found blob'})
+
         serializer = partieSerializer(data=partie)
         if serializer.is_valid():
             saved_partie = serializer.save()
+            equipe1 = Equipe(nom='1', partie_id=saved_partie)
+            equipe2 = Equipe(nom='2', partie_id=saved_partie)
+            equipe1.save()
+            equipe2.save()
         else:
             return Response({"response" : "error", "message" : serializer.errors})
         return Response(serializer.data)
+
+
+class UpdatePartieView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Partie.objects.all()
+    serializer_class = partieSerializer
+
+class CreateEquipeView(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    def post(self,request):
+        equipe = request.data.get('equipe')
+        if not equipe:
+            return Response({'response' : 'error', 'message' : 'No data found blob'})
+        serializer = equipeSerializer(data=equipe)
+        if serializer.is_valid():
+            saved_equipe = serializer.save()
+        else:
+            return Response({"response" : "error", "message" : serializer.errors})
+        return Response(serializer.data)
+
+class UpdateEquipeView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Equipe.objects.all()
+    serializer_class = joueurSerializer
+
+class GetEquipeFromPartie(generics.ListAPIView):
+    serializer_class = equipeSerializer
+
+    def get_queryset(self):
+        idpartie = self.kwargs['idpartie']
+        return Equipe.objects.filter(partie_id=idpartie)

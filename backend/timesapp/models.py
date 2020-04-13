@@ -18,15 +18,12 @@ STYLE_CHOICES = sorted([(item, item) for item in get_all_styles()])
 
 class Personnage(models.Model):
     nom = models.CharField(max_length=300)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='personnageowner', blank=True, null=True,
+                              on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.nom
 
-class Equipe(models.Model):
-    nom = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.nom
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -79,26 +76,35 @@ class Partie(models.Model):
     stadePartieEnCours = models.IntegerField(default=0)  # 0 = non lance, 1 = choix des noms perso,...
     listePersonnages = models.ManyToManyField(Personnage, related_name='personnages', blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='partieowner', blank=True, null=True, on_delete=models.SET_NULL)
+    code_unique = models.CharField(max_length=6, default=User.objects.make_random_password(6, '1234567890qwertyuiopasdfghjklzxcvbnm', ).upper())
 
     def __str__(self):
         return str(self.id)
 
-class PartieManager():
 
-    def _create_partie(self, stadePartieEnCours, owner, **extra_fields):
+class Equipe(models.Model):
+    nom = models.CharField(max_length=200, blank=True, null=True)
+    partie_id = models.ForeignKey(Partie, related_name='partie_equipe', blank=True, null=True, on_delete=models.SET_NULL)
 
-        if not owner:
+    def __str__(self):
+        return self.nom
+
+class EquipeManager():
+
+    def _create_equipe(self, nom, partie_id, **extra_fields):
+
+        if not nom:
             raise ValueError('The given owner must be set')
-        partie = self.model(stadePartieEnCours=stadePartieEnCours, **extra_fields)
-        partie.owner = self.model(partieowner=owner, **extra_fields)
-        partie.save(using=self._db)
-        return partie
+        equipe = self.model(nom=nom, **extra_fields)
+        equipe.partie_id = self.model(partie_id=partie_id, **extra_fields)
+        equipe.save(using=self._db)
+        return equipe
 
 
 class Joueur(models.Model):
     username = models.CharField(max_length=200)
-    partiencours = models.ForeignKey(Partie, related_name='partie', blank=True, null=True, on_delete=models.SET_NULL)
-    equipe = models.ForeignKey(Equipe, related_name='equipe', blank=True, null=True, on_delete=models.SET_NULL)
+    partiencours = models.ForeignKey(Partie, related_name='partie_joueur', blank=True, null=True, on_delete=models.SET_NULL)
+    equipe = models.ForeignKey(Equipe, related_name='equipe_joueur', blank=True, null=True, on_delete=models.SET_NULL)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
@@ -117,5 +123,16 @@ class JoueurManager():
 
 
     def create_joueur(self, username, owner=None, **extra_fields):
-
         return self._create_user(username, owner, **extra_fields)
+
+
+class PartieManager():
+
+    def _create_partie(self, stadePartieEnCours, owner, **extra_fields):
+
+        if not owner:
+            raise ValueError('The given owner must be set')
+        partie = self.model(stadePartieEnCours=stadePartieEnCours, **extra_fields)
+        partie.owner = self.model(partieowner=owner, **extra_fields)
+        partie.save(using=self._db)
+        return partie

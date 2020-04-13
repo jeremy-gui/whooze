@@ -21,7 +21,12 @@ urlpatterns = [
     path(r'current_user/', timesapp.get_current_user),
     path(r'users/create', timesapp.CreateUserView.as_view()),
     path(r'joueur/create', timesapp.CreateJoueurView.as_view()),
+    path(r'joueur/update/<int:pk>', timesapp.UpdateJoueurView.as_view()),
     path(r'partie/create', timesapp.CreatePartieView.as_view()),
+    path(r'partie/update/<int:pk>', timesapp.UpdatePartieView.as_view()),
+    path(r'equipe/create', timesapp.CreateEquipeView.as_view()),
+    path(r'equipe/update/<int:pk>', timesapp.UpdateEquipeView.as_view()),
+    path(r'equipe/frompartie/<int:idpartie>', timesapp.GetEquipeFromPartie.as_view()),
     path(r'', views.index, name='index')
 ]
 urlpatterns += [
