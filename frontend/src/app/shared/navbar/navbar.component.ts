@@ -2,10 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import {GlobalService, JoueurService, UserService} from '../../services/services.index';
 import { Router } from '@angular/router';
 import {User} from '../../models/user';
-import {Subscription} from 'rxjs';
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {Joueur} from '../../models/joueur';
 import {dateComparator} from '@ng-bootstrap/ng-bootstrap/datepicker/datepicker-tools';
+import {PartieService} from '../../services/partie.service';
+import {Partie} from '../../models/partie';
+import {EquipeService} from '../../services/services.index';
+import {Equipe} from '../../models/equipe';
 
 @Component({
   selector: 'app-navbar',
@@ -17,15 +21,30 @@ export class NavbarComponent implements OnInit {
   joueur: Joueur = new Joueur();
   userSub: Subscription;
   joueurSub: Subscription;
+  partie: Partie = new Partie();
+  partieSub: Subscription;
+
+  equipe1: Equipe = new Equipe();
+  equipe2: Equipe = new Equipe();
+  equipe1Sub: Subscription;
+  equipe2Sub: Subscription;
+
+  joueursTeam1Sub: Subscription;
+  joueursTeam1: Joueur[];
+  joueursTeam2Sub: Subscription;
+  joueursTeam2: Joueur[];
 
   title = environment.title;
   message: string;
+  currentPage: string;
 
   constructor(
-    private router: Router,
+    public router: Router,
     public _userService: UserService,
     private global: GlobalService,
     public _joueurService: JoueurService,
+    public _partieService: PartieService,
+    public _equipeService: EquipeService,
   ) { }
 
   ngOnInit() {
@@ -66,13 +85,41 @@ export class NavbarComponent implements OnInit {
         this._joueurService.joueurCreated = false;
         this.router.navigate(['/']);
       } else if (localStorage.getItem('joueur'))  {
+        this.global.megamer = JSON.parse(localStorage.getItem('joueur'));
         this.joueurSub = this.global.joueur.subscribe(
           megamer => this.joueur = megamer
         );
         this._joueurService.joueurCreated = true;
-        this.global.megamer = JSON.parse(localStorage.getItem('joueur'));
+
+        if (localStorage.getItem('partie')) {
+          this.global.megame = JSON.parse(localStorage.getItem('partie'));
+         // console.log(localStorage.getItem('partie'));
+          this.partieSub = this.global.partie.subscribe(
+            megame => this.partie = megame
+          );
+          this._partieService.partieCreated = true;
+
+          this.global.meteam1 = JSON.parse(localStorage.getItem('equipe1'));
+          this.global.meteam2 = JSON.parse(localStorage.getItem('equipe2'));
+          // console.log(localStorage.getItem('partie'));
+          this.equipe1Sub = this.global.equipe1.subscribe(
+            meteam1 => this.equipe1 = meteam1
+          );
+          this.equipe2Sub = this.global.equipe2.subscribe(
+            meteam2 => this.equipe2 = meteam2
+          );
+          this.global.joueurs_team1 = JSON.parse(localStorage.getItem('joueurs_team1'));
+          this.global.joueurs_team2 = JSON.parse(localStorage.getItem('joueurs_team2'));
+          this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
+            joueurs_team1 => this.joueursTeam1 = joueurs_team1
+          );
+          this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
+            joueurs_team2 => this.joueursTeam2 = joueurs_team2
+          );
+         }
      }
   }
+
 
 
     logout() {

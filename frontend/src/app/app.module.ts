@@ -7,7 +7,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {UserService, GlobalService, JoueurService} from './services/services.index';
 
-//components
+// components
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent} from './signup/signup.component';
@@ -18,6 +18,7 @@ import { ChooseusernameComponent } from './chooseusername/chooseusername.compone
 import { CreateorjoinpartieComponent } from './createorjoinpartie/createorjoinpartie.component';
 import {TokenInterceptor} from './services/token-interceptor';
 import {PartieService} from './services/partie.service';
+import {EquipeService} from './services/equipe.service';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import {PartieService} from './services/partie.service';
     ReactiveFormsModule,
     MainModule
   ],
-  providers: [UserService, GlobalService, JoueurService, PartieService, { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
+  providers: [UserService, GlobalService, JoueurService, PartieService, EquipeService,
+      { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })
 

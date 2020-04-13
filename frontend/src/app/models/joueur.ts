@@ -5,5 +5,7 @@ export class Joueur {
   id: number;
   username: string;
   owner_id: number;
+  partiencours: number;
+  equipe_id: number;
 }
 

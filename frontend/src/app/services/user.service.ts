@@ -86,9 +86,9 @@ export class UserService {
     this.token = null;
     this.token_expires = null;
     this.email = null;
-    localStorage.removeItem('token');
-    localStorage.removeItem('account');
+    localStorage.clear();
     this.connected = false;
+
   }
 
   createUser(user: any): Observable<any> {

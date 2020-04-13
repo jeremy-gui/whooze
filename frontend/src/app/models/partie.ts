@@ -6,5 +6,6 @@ export class Partie {
   stadePartieEnCours: number;
   personnages: [];
   owner_id: number;
+  code_unique: string;
 }
 
