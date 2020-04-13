@@ -1,0 +1,22 @@
+<h2 class="text-center mb-5">Give this code to your friends : {{this.partie.code_unique}}</h2>
+<div class="container justify-content-center">
+  <div class="row text-center justify-content-center">
+    <div class="col team-1">
+      <h3 class="text-info">Team 1</h3>
+      <ul class="listPlayer">
+        <li class="list-group-item h4 text-info" *ngFor="let joueur of joueursTeam1">{{joueur.username}}</li>
+      </ul>
+    </div>
+    <div class="col text-center justify-content-center">
+      <div class="row"><button type="button" (click)="GoToTeam1()" class="btn btn-primary btn-block btn-info text-white w-50 mb-5">Go to team 1</button></div>
+      <div class="row"><button type="button" (click)="GoToTeam2()" class="btn btn-primary btn-block btn-warning text-white w-50 mb-5">Go to team 2</button></div>
+      <div class="row"><button class="btn btn-primary btn-block btn-primary text-white w-50 ">Start Game</button></div>
+    </div>
+    <div class="col team-2">
+      <h3 class="text-warning">Team 2</h3>
+      <ul class="listPlayer list-group">
+        <li class="list-group-item h4 text-warning" *ngFor="let joueur of joueursTeam2">{{joueur.username}} </li>
+      </ul>
+    </div>
+  </div>
+</div>
