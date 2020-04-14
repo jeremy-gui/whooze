@@ -173,3 +173,18 @@ class GetEquipeFromPartie(generics.ListAPIView):
     def get_queryset(self):
         idpartie = self.kwargs['idpartie']
         return Equipe.objects.filter(partie_id=idpartie)
+
+
+class GetPartieFromGameCode(generics.ListAPIView):
+    serializer_class = partieSerializer
+
+    def get_queryset(self):
+        code = self.kwargs['codepartie']
+        return Partie.objects.filter(code_unique=code)
+
+class GetPartieFromId(generics.ListAPIView):
+    serializer_class = partieSerializer
+
+    def get_queryset(self):
+        idpartie = self.kwargs['idpartie']
+        return Partie.objects.filter(id=idpartie)

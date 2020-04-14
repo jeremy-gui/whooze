@@ -27,6 +27,8 @@ urlpatterns = [
     path(r'equipe/create', timesapp.CreateEquipeView.as_view()),
     path(r'equipe/update/<int:pk>', timesapp.UpdateEquipeView.as_view()),
     path(r'equipe/frompartie/<int:idpartie>', timesapp.GetEquipeFromPartie.as_view()),
+    path(r'partie/fromgamecode/<codepartie>', timesapp.GetPartieFromGameCode.as_view()),
+    path(r'partie/get/<int:idpartie>', timesapp.GetPartieFromId.as_view()),
     path(r'', views.index, name='index')
 ]
 urlpatterns += [
