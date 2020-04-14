@@ -5,6 +5,7 @@ import { MainComponent } from './main.component';
 import { HomeComponent } from '../home/home.component';
 import  { ChooseusernameComponent } from '../chooseusername/chooseusername.component';
 import {CreateorjoinpartieComponent} from '../createorjoinpartie/createorjoinpartie.component';
+import {EntercodeComponent} from '../entercode/entercode.component';
 
 const MAIN_ROUTES: Routes = [
     {
@@ -13,7 +14,9 @@ const MAIN_ROUTES: Routes = [
         children: [
             { path: '', component: HomeComponent },
             { path: 'chooseusername', component: ChooseusernameComponent},
-          { path: 'creategame', component: CreateorjoinpartieComponent}
+            { path: 'creategame', component: CreateorjoinpartieComponent},
+            { path: 'entergamecode', component: EntercodeComponent},
+          { path: 'joingame', component: CreateorjoinpartieComponent}
         ]
     }
 ];

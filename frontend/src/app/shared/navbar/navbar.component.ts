@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {GlobalService, JoueurService, UserService} from '../../services/services.index';
-import { Router } from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {User} from '../../models/user';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {environment} from '../../../environments/environment';
@@ -47,15 +47,25 @@ export class NavbarComponent implements OnInit {
     public _equipeService: EquipeService,
   ) { }
 
+
   ngOnInit() {
 
     if (history.state.data && history.state.data.registerOk)    {
       this.message = 'Thank you for suscribing ! Now let\'s play tooooo ';
-      history.state.data.registerOk.delete();
+      history.state.data.registerOk = false;
     }
+    else {
+      this.message = "";
+    }
+    this.router.events.subscribe((val) => {
+      // see also
+      if (val instanceof NavigationEnd) {
+        this.message = "";
+      }
+    });
     if (!localStorage.getItem('token') || !localStorage.getItem('account')) {
       this._userService.connected = false;
-      this.router.navigate(['/']);
+      this.router.navigate(['/']); this.message = "";
       } else if (localStorage.getItem('token') || localStorage.getItem('account')) {
 
       // on verifie d'abord que le token n'est pas sur le point d'expirer (dans les 3 jours)
@@ -99,23 +109,25 @@ export class NavbarComponent implements OnInit {
           );
           this._partieService.partieCreated = true;
 
-          this.global.meteam1 = JSON.parse(localStorage.getItem('equipe1'));
-          this.global.meteam2 = JSON.parse(localStorage.getItem('equipe2'));
-          // console.log(localStorage.getItem('partie'));
-          this.equipe1Sub = this.global.equipe1.subscribe(
-            meteam1 => this.equipe1 = meteam1
-          );
-          this.equipe2Sub = this.global.equipe2.subscribe(
-            meteam2 => this.equipe2 = meteam2
-          );
-          this.global.joueurs_team1 = JSON.parse(localStorage.getItem('joueurs_team1'));
-          this.global.joueurs_team2 = JSON.parse(localStorage.getItem('joueurs_team2'));
-          this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
-            joueurs_team1 => this.joueursTeam1 = joueurs_team1
-          );
-          this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
-            joueurs_team2 => this.joueursTeam2 = joueurs_team2
-          );
+          if (localStorage.getItem('joueurs_team1') || localStorage.getItem('joueurs_team2')) {
+            this.global.meteam1 = JSON.parse(localStorage.getItem('equipe1'));
+            this.global.meteam2 = JSON.parse(localStorage.getItem('equipe2'));
+            // console.log(localStorage.getItem('partie'));
+            this.equipe1Sub = this.global.equipe1.subscribe(
+              meteam1 => this.equipe1 = meteam1
+            );
+            this.equipe2Sub = this.global.equipe2.subscribe(
+              meteam2 => this.equipe2 = meteam2
+            );
+            this.global.joueurs_team1 = JSON.parse(localStorage.getItem('joueurs_team1'));
+            this.global.joueurs_team2 = JSON.parse(localStorage.getItem('joueurs_team2'));
+            this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
+              joueurs_team1 => this.joueursTeam1 = joueurs_team1
+            );
+            this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
+              joueurs_team2 => this.joueursTeam2 = joueurs_team2
+            );
+          }
          }
      }
   }
@@ -123,7 +135,24 @@ export class NavbarComponent implements OnInit {
 
 
     logout() {
-    this.userSub.unsubscribe();
+    if (this.userSub) {
+      this.userSub.unsubscribe();
+    }
+    if (this.joueursTeam1Sub) {
+      this.joueursTeam1Sub.unsubscribe();
+    }
+    if (this.equipe1Sub) {
+      this.equipe1Sub.unsubscribe();
+    }
+    if (this.joueurSub) {
+      this.joueurSub.unsubscribe();
+    }
+    if (this.equipe2Sub) {
+      this.equipe2Sub.unsubscribe();
+    }
+    if (this.joueursTeam2Sub) {
+      this.joueursTeam2Sub.unsubscribe();
+    }
 
     this._userService.logout();
     this.router.navigate(['/']);

@@ -19,12 +19,14 @@ import { CreateorjoinpartieComponent } from './createorjoinpartie/createorjoinpa
 import {TokenInterceptor} from './services/token-interceptor';
 import {PartieService} from './services/partie.service';
 import {EquipeService} from './services/equipe.service';
+import { EntercodeComponent } from './entercode/entercode.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    EntercodeComponent
   ],
   imports: [
     HttpClientModule,

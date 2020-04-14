@@ -4,6 +4,7 @@ import {HomeComponent} from './home/home.component';
 import {SignupComponent} from './signup/signup.component';
 import {ChooseusernameComponent} from './chooseusername/chooseusername.component';
 import {CreateorjoinpartieComponent} from './createorjoinpartie/createorjoinpartie.component';
+import {EntercodeComponent} from './entercode/entercode.component';
 
 const APP_ROUTES: Routes = [
   { path: 'login', component: LoginComponent },
@@ -11,6 +12,8 @@ const APP_ROUTES: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'chooseusername', component: ChooseusernameComponent },
   { path: 'creategame', component: CreateorjoinpartieComponent },
+  { path: 'joingame', component: CreateorjoinpartieComponent },
+  { path: 'entergamecode', component: EntercodeComponent },
   { path: '', component: HomeComponent }
 ];
 

@@ -44,4 +44,11 @@ export class PartieService {
        return this.http.post(`${this.baseUrl}timesapp/partie/create`, JSON.stringify({partie} ), this.httpOptions);
   }
 
+  public getPartieFromGameCode(code: any): Observable<any> {
+    return this.http.get(`${this.baseUrl}timesapp/partie/fromgamecode/${code}`, this.httpOptions);
+  }
+
+  public getPartieFromId(id: any): Observable<any> {
+    return this.http.get(`${this.baseUrl}timesapp/api/parties/${id}`, this.httpOptions);
+  }
 }

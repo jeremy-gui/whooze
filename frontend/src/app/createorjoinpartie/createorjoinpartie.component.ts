@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GlobalService} from '../services/global.service';
 import {JoueurService} from '../services/joueur.service';
 import {Router} from '@angular/router';
@@ -18,7 +18,7 @@ import {environment} from '../../environments/environment';
   templateUrl: './createorjoinpartie.component.html',
   styleUrls: ['./createorjoinpartie.component.css']
 })
-export class CreateorjoinpartieComponent implements OnInit {
+export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   codeToShare: any;
   account: User = new User();
   userSub: Subscription;
@@ -48,32 +48,35 @@ export class CreateorjoinpartieComponent implements OnInit {
   ngOnInit(): void {
 
     if (localStorage.getItem('token') || localStorage.getItem('account')) {
-      this.userSub = this.global.user.subscribe(
-        me => this.account = me
-      );
+        this.userSub = this.global.user.subscribe(
+          me => this.account = me
+        );
 
-      this.joueurSub = this.global.joueur.subscribe(
-        megamer => this.joueur = megamer
-      );
-      this.global.megamer = JSON.parse(localStorage.getItem('joueur'));
+        this.joueurSub = this.global.joueur.subscribe(
+          megamer => this.joueur = megamer
+        );
+        if (localStorage.getItem('joueur')) {
+          this.global.megamer = JSON.parse(localStorage.getItem('joueur'));
+        }
+          this.partieSub = this.global.partie.subscribe(
+            megame => this.partie = megame
+          );
 
-      this.partieSub = this.global.partie.subscribe(
-        megame => this.partie = megame
-      );
+          this.equipe1Sub = this.global.equipe1.subscribe(
+            meteam1 => this.equipe1 = meteam1
+          );
+          this.equipe2Sub = this.global.equipe2.subscribe(
+            meteam2 => this.equipe2 = meteam2
+          );
+          this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
+            joueurs_team1 => this.joueursTeam1 = joueurs_team1
+          );
+          this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
+            joueurs_team2 => this.joueursTeam2 = joueurs_team2
+          );
 
-      this.equipe1Sub = this.global.equipe1.subscribe(
-        meteam1 => this.equipe1 = meteam1
-      );
-      this.equipe2Sub = this.global.equipe2.subscribe(
-        meteam2 => this.equipe2 = meteam2
-      );
-      this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
-        joueurs_team1 => this.joueursTeam1 = joueurs_team1
-      );
-      this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
-        joueurs_team2 => this.joueursTeam2 = joueurs_team2
-      );
 
+        // si le joueur est le createur de la partie
       if (history.state.data && history.state.data.creator) {
         this.partie.owner_id = this.account.id;
         this.partie.stadePartieEnCours = 0;
@@ -110,6 +113,42 @@ export class CreateorjoinpartieComponent implements OnInit {
           });
 
       }
+      // fin du createur de la partie
+
+      // si le joueur rejoins la partie
+
+      if (history.state.data && history.state.data.partieid) {
+
+        this._partieService.getPartieFromId(history.state.data.partieid).pipe(take(1),
+          tap(res => {
+            this.partie = res;
+            this.joueur.partiencours = res.id;
+            this.global.megame = res;
+          }),
+          concatMap((res: Partie) => this._equipeService.getEquipe(res).pipe(take(1),
+            tap(result => {
+              if (result[0].nom === '1') {
+                this.equipe1 = result[0];
+                this.equipe2 = result[1];
+              } else if (result[0].nom === '2') {
+                this.equipe2 = result[0];
+                this.equipe1 = result[1];
+              }
+              this.joueur.equipe_id = this.equipe1.id;
+              this.global.meteam1 = this.equipe1;
+              this.global.meteam2 = this.equipe2;
+            }),
+            concatMap(() => this._joueurService.updatePartielJoueur(this.joueur, {partiencours: res.id, equipe: this.equipe1.id}))
+            )
+          )).subscribe(res => {
+          this.joueur = res;
+          this.global.megamer = this.joueur;
+          this.joueursTeam1.push(this.joueur);
+          this.global.joueurs_team1 = this.joueursTeam1;
+          this.global.joueurs_team2 = [];
+        });
+      }
+
     }
   }
 
@@ -145,5 +184,19 @@ export class CreateorjoinpartieComponent implements OnInit {
       }
       x = x + 1;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.equipe1Sub.unsubscribe();
+    this.partieSub.unsubscribe();
+    this.joueurSub.unsubscribe();
+    this.equipe2Sub.unsubscribe();
+    this.global.joueurs_team1 = [];
+    this.global.joueurs_team2 = [];
+    this.joueursTeam1Sub.unsubscribe();
+    this.joueursTeam2Sub.unsubscribe();
+    this.userSub.unsubscribe();
+    localStorage.removeItem('joueurs_team1');
+    localStorage.removeItem('joueurs_team2');
   }
 }
