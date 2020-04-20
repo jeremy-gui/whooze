@@ -26,7 +26,7 @@ export class JoueurService {
 
 
   public updatePartielJoueur(joueur: any, param: any): Observable<any> {
-    let body = JSON.stringify(param);
+    const body = JSON.stringify(param);
     return this.http.patch(`${this.baseUrl}timesapp/joueur/update/${joueur.id}`, body, this.httpOptions);
   }
 }

@@ -33,6 +33,8 @@ export class ChooseusernameComponent implements OnInit {
       this.nextPage = "joingame";
     }
     if (localStorage.getItem('token') || localStorage.getItem('account')) {
+
+      this.account = JSON.parse(localStorage.getItem('account'));
       this.userSub = this.global.user.subscribe(
         me => this.account = me
       );
@@ -64,17 +66,18 @@ export class ChooseusernameComponent implements OnInit {
     if (this.registerForm.invalid) {
       return;
     } else {
-      this.joueur = new Joueur(this.registerForm.value);
+      this.joueur = this.registerForm.value;
       this.joueur.owner_id = this.account.id;
       this._joueurService.createJoueur(this.joueur).subscribe(
         data => {
-          this.joueur = data.joueur;
-          localStorage.setItem('joueur', JSON.stringify(data));
+          this.joueur = data;
+          localStorage.setItem('joueur', JSON.stringify(this.joueur));
+
           this._joueurService.joueurCreated = true;
           if (this.nextPage === "creategame") {
           this.router.navigate(['creategame'], { state: {data: {"creator" : true}}});
           } else if (this.nextPage === "joingame") {
-            this.router.navigate(['entergamecode'], { state: {data: {"creator" : false}}});
+           this.router.navigate(['entergamecode'], { state: {data: {"creator" : false}}});
           }
         },
         error => {

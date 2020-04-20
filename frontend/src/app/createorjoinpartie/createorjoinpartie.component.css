@@ -5,3 +5,6 @@ button {
   margin-right: auto;
   display: block;
 }
+li {
+  margin-bottom: 0;
+}

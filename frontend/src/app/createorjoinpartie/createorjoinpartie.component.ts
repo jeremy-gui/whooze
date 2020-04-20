@@ -3,15 +3,19 @@ import {GlobalService} from '../services/global.service';
 import {JoueurService} from '../services/joueur.service';
 import {Router} from '@angular/router';
 import {User} from '../models/user';
-import {Subscription} from 'rxjs';
-import {map, flatMap, tap, concatMap, take} from 'rxjs/operators';
+import {Subject, Subscription} from 'rxjs';
+import {map, flatMap, tap, concatMap, take, takeUntil} from 'rxjs/operators';
 import {Joueur} from '../models/joueur';
 import {PartieService} from '../services/partie.service';
-import {Partie} from '../models/partie';
+import {Partie, StadePartieEnCours} from '../models/partie';
 import {Equipe} from '../models/equipe';
 import {EquipeService} from '../services/equipe.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {Message} from '@angular/compiler/src/i18n/i18n_ast';
+import {FormControl} from '@angular/forms';
+import {UserService} from '../services/user.service';
+import {element} from 'protractor';
 
 @Component({
   selector: 'app-createorjoinpartie',
@@ -35,11 +39,14 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   joueursTeam1: Joueur[] = new  Array();
   joueursTeam2Sub: Subscription;
   joueursTeam2: Joueur[] = new  Array();
+  messages: Message[] = [];
+  msgCtrl = new FormControl('');
+  destroyed$ = new Subject();
 
   baseUrl: string = environment.apiUrl;
   private httpOptions: any;
 
-  constructor(private http: HttpClient, private global: GlobalService, public _joueurService: JoueurService, public _partieService: PartieService, public _equipeService: EquipeService, private router: Router) {
+  constructor(private http: HttpClient, private global: GlobalService, public _userService: UserService, public _joueurService: JoueurService, public _partieService: PartieService, public _equipeService: EquipeService, private router: Router) {
     this.httpOptions = {
       headers: new HttpHeaders({'Content-Type': 'application/json'})
     };
@@ -47,47 +54,36 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+
     if (localStorage.getItem('token') || localStorage.getItem('account')) {
+
+        this.global.me = JSON.parse(localStorage.getItem('account'));
         this.userSub = this.global.user.subscribe(
           me => this.account = me
         );
-
-        this.joueurSub = this.global.joueur.subscribe(
-          megamer => this.joueur = megamer
-        );
         if (localStorage.getItem('joueur')) {
           this.global.megamer = JSON.parse(localStorage.getItem('joueur'));
+          this.joueurSub = this.global.joueur.subscribe(
+            megamer => this.joueur = megamer
+          );
         }
-          this.partieSub = this.global.partie.subscribe(
-            megame => this.partie = megame
-          );
-
-          this.equipe1Sub = this.global.equipe1.subscribe(
-            meteam1 => this.equipe1 = meteam1
-          );
-          this.equipe2Sub = this.global.equipe2.subscribe(
-            meteam2 => this.equipe2 = meteam2
-          );
-          this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
-            joueurs_team1 => this.joueursTeam1 = joueurs_team1
-          );
-          this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
-            joueurs_team2 => this.joueursTeam2 = joueurs_team2
-          );
-
+        if (localStorage.getItem('partie')) {
+          //this.subscribeGame();
+        }
 
         // si le joueur est le createur de la partie
-      if (history.state.data && history.state.data.creator) {
+        if (history.state.data && history.state.data.creator) {
         this.partie.owner_id = this.account.id;
-        this.partie.stadePartieEnCours = 0;
+        this.partie.StadePartieEnCours = StadePartieEnCours.CREATE_TEAMS;
         history.state.data.creator = false;
 
         this._partieService.createPartie(this.partie)
           .pipe(take(1),
             tap(res => {
                 this.partie = res;
-                this.joueur.partiencours = res.id;
-                this.global.megame = res;
+                this.partie.owner_id = res.owner.id;
+                this.joueur.partiencours = this.partie.id;
+                //this.global.megame = this.partie;
               }),
           concatMap((res: Partie) => this._equipeService.getEquipe(res).pipe(take(1),
             tap(result => {
@@ -102,7 +98,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
               this.global.meteam1 = this.equipe1;
               this.global.meteam2 = this.equipe2;
             }),
-            concatMap(() => this._joueurService.updatePartielJoueur(this.joueur, {partiencours: res.id, equipe: this.equipe1.id}))
+            concatMap(() => this._joueurService.updatePartielJoueur(this.joueur, {partiencours: this.partie.id, equipe: this.equipe1.id}))
           )
           )).subscribe(res => {
               this.joueur = res;
@@ -110,20 +106,30 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
               this.joueursTeam1.push(this.joueur);
               this.global.joueurs_team1 = this.joueursTeam1;
               this.global.joueurs_team2 = [];
+              this.subscribeGame();
+              this.connect(this.partie.code_unique);
           });
 
       }
       // fin du createur de la partie
 
-      // si le joueur rejoins la partie
+      // si le joueur rejoins une partie déjà créé
 
-      if (history.state.data && history.state.data.partieid) {
-
-        this._partieService.getPartieFromId(history.state.data.partieid).pipe(take(1),
+        else if ((history.state.data && history.state.data.partieid) || localStorage.getItem('partie')) {
+          let idpartie;
+          if (history.state.data && history.state.data.partieid) {
+            idpartie = history.state.data.partieid;
+            history.state.data.partieid = null;
+          }  else if (localStorage.getItem('partie')) {
+            idpartie = JSON.parse(localStorage.getItem('partie')).id;
+          }
+          this._partieService.getPartieFromId(idpartie).pipe(take(1),
           tap(res => {
             this.partie = res;
             this.joueur.partiencours = res.id;
-            this.global.megame = res;
+            this.partie.owner_id = res.owner.id;
+            localStorage.setItem('partie', JSON.stringify(res));
+            this.subscribeGame();
           }),
           concatMap((res: Partie) => this._equipeService.getEquipe(res).pipe(take(1),
             tap(result => {
@@ -134,26 +140,45 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
                 this.equipe2 = result[0];
                 this.equipe1 = result[1];
               }
-              this.joueur.equipe_id = this.equipe1.id;
+              if (JSON.parse(localStorage.getItem('joueur')).equipe) {
+                this.joueur.equipe_id = JSON.parse(localStorage.getItem('joueur')).equipe;
+                this.global.megamer = this.joueur;
+                if (this.joueur.equipe_id === this.equipe1.id) {
+                  this.GoToTeam1(false);
+                } else if (this.joueur.equipe_id === this.equipe2.id) {
+                  this.GoToTeam2(false);
+                }
+              } else {
+                this.joueur.equipe_id = this.equipe1.id;
+              }
               this.global.meteam1 = this.equipe1;
               this.global.meteam2 = this.equipe2;
             }),
-            concatMap(() => this._joueurService.updatePartielJoueur(this.joueur, {partiencours: res.id, equipe: this.equipe1.id}))
+            concatMap(() => this._joueurService.updatePartielJoueur(this.joueur, {partiencours: this.partie.id, equipe: this.equipe1.id}))
             )
           )).subscribe(res => {
           this.joueur = res;
-          this.global.megamer = this.joueur;
           this.joueursTeam1.push(this.joueur);
           this.global.joueurs_team1 = this.joueursTeam1;
           this.global.joueurs_team2 = [];
+          this.getTeam1();
+          this.getTeam2();
         });
       }
 
     }
   }
 
-  GoToTeam1() {
-    let x = 0;
+  GoToTeam1(getteam = true) {
+    this._joueurService.updatePartielJoueur(this.joueur, {equipe: this.equipe1.id}).subscribe(result => {
+      this.global.megamer = result;
+      if (getteam) {
+        this.getTeam1();
+        this.getTeam2();
+      }
+    });
+
+  /*  let x = 0;
 
     this.joueursTeam2.forEach(j => {
       if (this.joueur.id === j.id) {
@@ -166,27 +191,51 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
         this.global.megamer = this.joueur;
       }
       x = x + 1;
-    });
+    });*/
   }
 
-  GoToTeam2() {
-     let x = 0;
-
-      this.joueursTeam1.forEach(j => {
-      if (this.joueur.id === j.id) {
-        this.joueur.equipe_id = this.equipe2.id;
-        this.joueursTeam1.splice(x, 1);
-        this.joueursTeam2.push(this.joueur);
-        this.global.joueurs_team1 = this.joueursTeam1;
-        this.global.joueurs_team2 = this.joueursTeam2;
-        this._joueurService.updatePartielJoueur(this.joueur, {equipe: this.equipe2.id}).subscribe();
-        this.global.megamer = this.joueur;
+  GoToTeam2(getteam = true) {
+    this._joueurService.updatePartielJoueur(this.joueur, {equipe: this.equipe2.id}).subscribe(result => {
+      this.global.megamer = result;
+      if (getteam) {
+        this.getTeam1();
+        this.getTeam2();
       }
-      x = x + 1;
     });
   }
+
+  subscribeGame()  {
+    this.global.megame = JSON.parse(localStorage.getItem('partie'));
+    this.partieSub = this.global.partie.subscribe(
+      megame => this.partie = megame
+    );
+
+    this.global.meteam1 = JSON.parse(localStorage.getItem('equipe1'));
+    this.equipe1Sub = this.global.equipe1.subscribe(
+      meteam1 => this.equipe1 = meteam1
+    );
+    this.global.meteam2 = JSON.parse(localStorage.getItem('equipe2'));
+    this.equipe2Sub = this.global.equipe2.subscribe(
+      meteam2 => this.equipe2 = meteam2
+    );
+    this.global.joueurs_team1 = JSON.parse(localStorage.getItem('joueurs_team1'));
+    this.joueursTeam1Sub = this.global.joueursTeam1.subscribe(
+      joueurs_team1 => this.joueursTeam1 = joueurs_team1
+    );
+    this.global.joueurs_team2 = JSON.parse(localStorage.getItem('joueurs_team2'));
+    this.joueursTeam2Sub = this.global.joueursTeam2.subscribe(
+      joueurs_team2 => this.joueursTeam2 = joueurs_team2
+    );
+    if (this.partie.code_unique) {
+      this.connect(this.partie.code_unique);
+      this.getTeam1();
+      this.getTeam2();
+    }
+  }
+
 
   ngOnDestroy(): void {
+    this.destroyed$.next();
     this.equipe1Sub.unsubscribe();
     this.partieSub.unsubscribe();
     this.joueurSub.unsubscribe();
@@ -198,5 +247,66 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
     this.userSub.unsubscribe();
     localStorage.removeItem('joueurs_team1');
     localStorage.removeItem('joueurs_team2');
+  }
+
+  connect(code) {
+    this.account.token = this._userService.token;
+    this._partieService.connect(code, this.account.token).pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(messages => {
+      if (messages.message.requete === 'message') {
+        this.messages.push(messages.message);
+      }
+      if (messages.message.requete === 'get_team1') {
+         if (messages.message.newpartie === 'True') { //si le craeteur a quitter la partie et que ce joueur reprends le owner
+           this._partieService.getPartieFromId(this.partie.id).subscribe(res => {
+             this.partie = res;
+             this.partie.owner_id = res.owner.id;
+             this.global.megame = this.partie;
+
+           });
+         }
+
+          const result = JSON.parse(messages.message.equipe);
+          this.global.joueurs_team1 = [];
+          result.forEach(element => {
+            let j: Joueur = new Joueur();
+            j.id = element.pk;
+            j.equipe_id = element.fields.equipe_id;
+            j.username = element.fields.username;
+            j.owner_id = element.fields.owner_id;
+            j.partiencours = element.fields.partiencours;
+            this.joueursTeam1.push(j);
+          });
+          this.global.joueurs_team1 = this.joueursTeam1;
+      }
+      if (messages.message.requete === 'get_team2') {
+        const result = JSON.parse(messages.message.equipe);
+        this.global.joueurs_team2 = [];
+        result.forEach(element => {
+          let j: Joueur = new Joueur();
+          j.id = element.pk;
+          j.equipe_id = element.fields.equipe_id;
+          j.username = element.fields.username;
+          j.owner_id = element.fields.owner_id;
+          j.partiencours = element.fields.partiencours;
+          this.joueursTeam2.push(j);
+        });
+        this.global.joueurs_team2 = this.joueursTeam2;
+      }
+
+
+    });
+  }
+  getTeam1() {
+    this._partieService.send("" , "get_team1");
+  }
+  getTeam2() {
+    this._partieService.send("" , "get_team2");
+  }
+  sendMessage() {
+    this.account.token = this._userService.token;
+    this._partieService.send(this.msgCtrl.value , "message");
+    this.msgCtrl.setValue('');
   }
 }
