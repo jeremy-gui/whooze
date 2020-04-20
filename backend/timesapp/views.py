@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse, HttpResponse
+from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
+from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
 from rest_framework.decorators import action, api_view
 from rest_framework import status, permissions
 from rest_framework.mixins import UpdateModelMixin
@@ -24,6 +26,14 @@ def index(request, path=''):
     The home page. This renders the container for the single-page app.
     """
     return render(request, 'timesapp/index.html')
+
+
+
+def room(request, room_name):
+    return render(request, 'timesapp/room.html', {
+        'room_name': room_name
+    })
+
 
 
 class HomePageView(TemplateView):
@@ -132,6 +142,9 @@ class CreatePartieView(APIView):
         if not partie:
             return Response({'response' : 'error', 'message' : 'No data found blob'})
 
+
+        partie['code_unique'] = User.objects.make_random_password(6, '1234567890qwertyuiopasdfghjklzxcvbnm', ).upper()
+
         serializer = partieSerializer(data=partie)
         if serializer.is_valid():
             saved_partie = serializer.save()
@@ -188,3 +201,17 @@ class GetPartieFromId(generics.ListAPIView):
     def get_queryset(self):
         idpartie = self.kwargs['idpartie']
         return Partie.objects.filter(id=idpartie)
+
+class GetJoueurFromId(generics.ListAPIView):
+    serializer_class = joueurSerializer
+
+    def get_queryset(self):
+        idjoueur = self.kwargs['idpartie']
+        return Joueur.objects.filter(id=idjoueur)
+
+class GetAllPlayerOfOneEquipe(generics.ListAPIView):
+    serializer_class = joueurSerializer
+
+    def get_queryset(self):
+        idEquipe = self.kwargs['idequipe']
+        return Joueur.objects.filter(equipe=idEquipe)

@@ -1,19 +1,11 @@
 import datetime
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters.html import HtmlFormatter
-from pygments import highlight
-from pygments.styles import get_all_styles
-from pygments.lexers import get_all_lexers
-
-
-LEXERS = [item for item in get_all_lexers() if item[1]]
-LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
-STYLE_CHOICES = sorted([(item, item) for item in get_all_styles()])
+from django.urls import reverse
 
 
 class Personnage(models.Model):
@@ -73,10 +65,24 @@ class User(AbstractUser):
 
 
 class Partie(models.Model):
-    stadePartieEnCours = models.IntegerField(default=0)  # 0 = non lance, 1 = choix des noms perso,...
+    CREATE_TEAMS = 'CREATE_TEAMS'
+    CHOOSE_PERSO = 'CHOOSE_PERSO'
+    ROUND_1 = 'ROUND_1'
+    ROUND_2 = 'ROUND_2'
+    ROUND_3 = 'ROUND_3'
+    COMPLETED = 'COMPLETED'
+    STATUSES = (
+        (CREATE_TEAMS, CREATE_TEAMS),
+        (CHOOSE_PERSO, CHOOSE_PERSO),
+        (ROUND_1, ROUND_1),
+        (ROUND_2, ROUND_2),
+        (ROUND_3, ROUND_3),
+        (COMPLETED, COMPLETED),
+    )
+    stadePartieEnCours = models.CharField(max_length=20, choices=STATUSES, default=CREATE_TEAMS)
     listePersonnages = models.ManyToManyField(Personnage, related_name='personnages', blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='partieowner', blank=True, null=True, on_delete=models.SET_NULL)
-    code_unique = models.CharField(max_length=6, default=User.objects.make_random_password(6, '1234567890qwertyuiopasdfghjklzxcvbnm', ).upper())
+    code_unique = models.CharField(max_length=6, blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -136,3 +142,42 @@ class PartieManager():
         partie.owner = self.model(partieowner=owner, **extra_fields)
         partie.save(using=self._db)
         return partie
+
+class Trip(models.Model):
+    REQUESTED = 'REQUESTED'
+    STARTED = 'STARTED'
+    IN_PROGRESS = 'IN_PROGRESS'
+    COMPLETED = 'COMPLETED'
+    STATUSES = (
+        (REQUESTED, REQUESTED),
+        (STARTED, STARTED),
+        (IN_PROGRESS, IN_PROGRESS),
+        (COMPLETED, COMPLETED),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    pick_up_address = models.CharField(max_length=255)
+    drop_off_address = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, choices=STATUSES, default=REQUESTED)
+    driver = models.ForeignKey( # new
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        related_name='trips_as_driver'
+    )
+    rider = models.ForeignKey( # new
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        related_name='trips_as_rider'
+    )
+
+    def __str__(self):
+        return f'{self.id}'
+
+    def get_absolute_url(self):
+        return reverse('trip:trip_detail', kwargs={'trip_id': self.id})

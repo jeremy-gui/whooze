@@ -12,9 +12,11 @@ class userSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'parties', 'joueurs']
 
+
 class partieSerializer(serializers.ModelSerializer):
     owner = userSerializer(many=False, read_only=True)
     owner_id = serializers.IntegerField(write_only=True)
+
 
     class Meta:
         model = Partie

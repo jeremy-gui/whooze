@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
+import asyncio
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from datetime import datetime, timedelta
@@ -33,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,6 +60,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'times.urls'
 
+ASGI_APPLICATION = 'times.routing.application'
+WSGI_APPLICATION = 'times.wsgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -74,7 +88,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'times.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -144,6 +157,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
+
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
