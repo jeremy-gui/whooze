@@ -18,7 +18,8 @@ from rest_framework import generics
 from django.shortcuts import render
 
 from .models import Partie, Joueur, Equipe, Personnage, User
-from .serializers import partieSerializer, joueurSerializer, userSerializer, UserSerializerWithToken, equipeSerializer
+from .serializers import partieSerializer, joueurSerializer, userSerializer, UserSerializerWithToken, equipeSerializer, \
+    personnageSerializer
 
 
 def index(request, path=''):
@@ -174,6 +175,30 @@ class CreateEquipeView(APIView):
         else:
             return Response({"response" : "error", "message" : serializer.errors})
         return Response(serializer.data)
+"""
+class CreatePersonnageView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        personnage = request.data.get('personnage')
+        if not personnage:
+            return Response({'response': 'error', 'message': 'No data found blob'})
+        serializer = personnageSerializer(data=personnage)
+        if serializer.is_valid():
+            saved_personnage = serializer.save()
+        else:
+            return Response({"response": "error", "message": serializer.errors})
+        return Response(serializer.data)
+"""
+class PersonnageDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Personnage.objects.all()
+    serializer_class = personnageSerializer
+
+class PersonnageList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Personnage.objects.all()
+    serializer_class = personnageSerializer
 
 class UpdateEquipeView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticated,)

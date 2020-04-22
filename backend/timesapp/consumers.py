@@ -37,66 +37,51 @@ class PartieConsumer(AsyncAPIConsumer):
             event = {}
             event['message'] = inst
             self.chat_message(event)
-
+            await self.disconnect(event['code'])
 
     async def disconnect(self, close_code):
         partie = await self.getPartie()
-        retu = await self.deletePlayerInTeam(partie)
 
-        self.scope['joueur'] = ""
-        event = {}
-        event['message'] = ""
-        self.chat_message(event)
-        equipe2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
-        data = {}
-        data["requete"] = 'get_team2'
-        data["equipe"] = equipe2
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': data,
-            }
-        )
-        equipe1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
-        data = {}
-        data["requete"] = 'get_team1'
-        data["equipe"] = equipe1
-        if retu != False:
-            data["newpartie"] = 'True'
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': data,
-            }
-        )
+        if self.scope['partie'].stadePartieEnCours == partie.CREATE_TEAMS :
+            retu = await self.deletePlayerInTeam(partie)
+
+            self.scope['joueur'] = ""
+            event = {}
+            event['message'] = ""
+            self.chat_message(event)
+            equipe2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+            data = {}
+            data["requete"] = 'get_team2'
+            data["equipe"] = equipe2
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': data,
+                }
+            )
+            equipe1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+            data = {}
+            data["requete"] = 'get_team1'
+            data["equipe"] = equipe1
+            if retu != False:
+                data["newpartie"] = 'True'
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': data,
+                }
+            )
+
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
-        # Receive message from WebSocket
 
 
-
-    """async def _verify_token(self, data):
-        user = await self._verify_token(data)
-        trip_data = ReadOnlyTripSerializer(trip).data
-        await self.send_json({
-            'type': 'create.trip',
-            'data': trip_data
-        })
-
-    # new
-    @database_sync_to_async
-    def _verify_token(self, data):
-        serializer = TripSerializer(data=content)
-        serializer.is_valid(raise_exception=True)
-        trip = serializer.create(serializer.validated_data)
-        return trip
-"""
 
     @database_sync_to_async
     def deletePlayerInTeam(self, partie):
@@ -144,12 +129,23 @@ class PartieConsumer(AsyncAPIConsumer):
 
         return joueur
 
+    @database_sync_to_async
+    def setCurrentPlayerReadyToStart(self, readyornot):
+        Joueur.objects.filter(pk=self.scope['joueur'].get().id).update(readytostart=readyornot)
+        self.scope['joueur'].readytostart = readyornot
 
     @database_sync_to_async
     def getPartie(self):
         partie = Partie.objects.get(code_unique=self.room_name)
         self.scope['partie'] = partie
         return self.scope['partie']
+
+    @database_sync_to_async
+    def letsCreatePerso(self, partie):
+        Partie.objects.filter(id=partie.id).update(stadePartieEnCours=partie.CHOOSE_PERSO)
+        data = Partie.objects.filter(id=partie.id)
+        self.scope['partie'] = data
+        return  serializers.serialize("json", data)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -191,6 +187,46 @@ class PartieConsumer(AsyncAPIConsumer):
                         'message': tobesend
                     },
                 )
+            if (requete == 'letscreateperso') :
+                await self.getPartie()
+                updatedpartie = await self.letsCreatePerso(self.scope['partie'])
+
+                data = {}
+                data["requete"] = requete
+                data["message"] = updatedpartie
+                tobesend = data
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': tobesend
+                    },
+                )
+            if (requete == 'readytostart') :
+                await self.getPartie()
+                await self.getCurrentPlayer()
+                await self.setCurrentPlayerReadyToStart(message)
+                await self.getPartie()
+                equipe1 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+                equipe2 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+
+                data = {}
+                data["equipe1"] = equipe1
+                data["equipe2"] = equipe2
+
+                self.scope["readytostart"] = message
+
+                data["requete"] = 'majteam'
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+
             if (requete == 'message') :
                 tellme = user.email + " say : " + message
                 data = {}
@@ -206,6 +242,9 @@ class PartieConsumer(AsyncAPIConsumer):
                     },
                 )
         else :
+            """
+            test envoi message chat avec controle token
+            """
             user = await self.verifyToken(text_data_json['user'])
             self.scope['user'] = user['user']
 

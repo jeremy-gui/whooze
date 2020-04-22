@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
-from .models import Partie, Joueur, User, Equipe
+from .models import Partie, Joueur, User, Equipe, Personnage
 
 
 class userSerializer(serializers.ModelSerializer):
@@ -37,6 +37,13 @@ class equipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Equipe
+        fields = '__all__'
+
+class personnageSerializer(serializers.ModelSerializer):
+    owner = userSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Personnage
         fields = '__all__'
 
 class UserSerializerWithToken(serializers.ModelSerializer):
