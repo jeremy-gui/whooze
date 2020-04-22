@@ -4,7 +4,7 @@ import {JoueurService} from '../services/joueur.service';
 import {Router} from '@angular/router';
 import {User} from '../models/user';
 import {Subject, Subscription} from 'rxjs';
-import {map, flatMap, tap, concatMap, take, takeUntil} from 'rxjs/operators';
+import {concatMap, take, takeUntil, tap} from 'rxjs/operators';
 import {Joueur} from '../models/joueur';
 import {PartieService} from '../services/partie.service';
 import {Partie, StadePartieEnCours} from '../models/partie';
@@ -15,7 +15,6 @@ import {environment} from '../../environments/environment';
 import {Message} from '@angular/compiler/src/i18n/i18n_ast';
 import {FormControl} from '@angular/forms';
 import {UserService} from '../services/user.service';
-import {element} from 'protractor';
 
 @Component({
   selector: 'app-createorjoinpartie',
@@ -42,6 +41,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   messages: Message[] = [];
   msgCtrl = new FormControl('');
   destroyed$ = new Subject();
+  messageErreur: string = '';
 
   baseUrl: string = environment.apiUrl;
   private httpOptions: any;
@@ -68,13 +68,13 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
           );
         }
         if (localStorage.getItem('partie')) {
-          //this.subscribeGame();
+          this.subscribeGame();
         }
 
         // si le joueur est le createur de la partie
         if (history.state.data && history.state.data.creator) {
         this.partie.owner_id = this.account.id;
-        this.partie.StadePartieEnCours = StadePartieEnCours.CREATE_TEAMS;
+        this.partie.stadePartieEnCours = StadePartieEnCours.CREATE_TEAMS;
         history.state.data.creator = false;
 
         this._partieService.createPartie(this.partie)
@@ -83,7 +83,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
                 this.partie = res;
                 this.partie.owner_id = res.owner.id;
                 this.joueur.partiencours = this.partie.id;
-                //this.global.megame = this.partie;
+                this.global.megame = this.partie;
               }),
           concatMap((res: Partie) => this._equipeService.getEquipe(res).pipe(take(1),
             tap(result => {
@@ -158,9 +158,6 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
             )
           )).subscribe(res => {
           this.joueur = res;
-          this.joueursTeam1.push(this.joueur);
-          this.global.joueurs_team1 = this.joueursTeam1;
-          this.global.joueurs_team2 = [];
           this.getTeam1();
           this.getTeam2();
         });
@@ -235,18 +232,15 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
+    this._partieService.closeConnection();
     this.destroyed$.next();
     this.equipe1Sub.unsubscribe();
     this.partieSub.unsubscribe();
     this.joueurSub.unsubscribe();
     this.equipe2Sub.unsubscribe();
-    this.global.joueurs_team1 = [];
-    this.global.joueurs_team2 = [];
     this.joueursTeam1Sub.unsubscribe();
     this.joueursTeam2Sub.unsubscribe();
     this.userSub.unsubscribe();
-    localStorage.removeItem('joueurs_team1');
-    localStorage.removeItem('joueurs_team2');
   }
 
   connect(code) {
@@ -254,9 +248,6 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
     this._partieService.connect(code, this.account.token).pipe(
       takeUntil(this.destroyed$)
     ).subscribe(messages => {
-      if (messages.message.requete === 'message') {
-        this.messages.push(messages.message);
-      }
       if (messages.message.requete === 'get_team1') {
          if (messages.message.newpartie === 'True') { //si le craeteur a quitter la partie et que ce joueur reprends le owner
            this._partieService.getPartieFromId(this.partie.id).subscribe(res => {
@@ -266,7 +257,6 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
 
            });
          }
-
           const result = JSON.parse(messages.message.equipe);
           this.global.joueurs_team1 = [];
           result.forEach(element => {
@@ -276,6 +266,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
             j.username = element.fields.username;
             j.owner_id = element.fields.owner_id;
             j.partiencours = element.fields.partiencours;
+            j.readytostart = element.fields.readytostart;
             this.joueursTeam1.push(j);
           });
           this.global.joueurs_team1 = this.joueursTeam1;
@@ -290,9 +281,17 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
           j.username = element.fields.username;
           j.owner_id = element.fields.owner_id;
           j.partiencours = element.fields.partiencours;
+          j.readytostart = element.fields.readytostart;
           this.joueursTeam2.push(j);
         });
         this.global.joueurs_team2 = this.joueursTeam2;
+      }
+      if (messages.message.requete === 'letscreateperso') {
+
+        const choose = StadePartieEnCours.CHOOSE_PERSO;
+        this.partie.stadePartieEnCours = choose;
+        this.global.megame = this.partie;
+        this.router.navigate(['createperso']);
       }
 
 
@@ -308,5 +307,14 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
     this.account.token = this._userService.token;
     this._partieService.send(this.msgCtrl.value , "message");
     this.msgCtrl.setValue('');
+  }
+
+  StartGame() {
+    if ((this.joueursTeam1.length + this.joueursTeam2.length) < 4) {
+        this.messageErreur = 'The number of players must be at least 4';
+    } else if (this.joueursTeam1.length < 2 || this.joueursTeam2.length < 2) {
+        this.messageErreur = 'The number of players per team must be at least 2';
+    }
+    this._partieService.send('', 'letscreateperso');
   }
 }

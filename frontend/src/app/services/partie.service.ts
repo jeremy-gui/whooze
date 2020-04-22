@@ -45,6 +45,7 @@ export class PartieService {
     );
   }
   closeConnection() {
+
     if (this.connection$) {
       this.connection$.complete();
       this.connection$ = null;

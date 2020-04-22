@@ -7,13 +7,15 @@ import { HomeComponent } from '../home/home.component';
 import {ChooseusernameComponent} from '../chooseusername/chooseusername.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {CreateorjoinpartieComponent} from '../createorjoinpartie/createorjoinpartie.component';
+import {CreatepersoComponent} from '../createperso/createperso.component';
 
 @NgModule({
     declarations: [
         MainComponent,
         HomeComponent,
         ChooseusernameComponent,
-        CreateorjoinpartieComponent
+        CreateorjoinpartieComponent,
+        CreatepersoComponent
     ],
   imports: [
     CommonModule,

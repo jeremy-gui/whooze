@@ -4,6 +4,7 @@ import { User } from '../models/user';
 import {Joueur} from '../models/joueur';
 import {Partie} from '../models/partie';
 import {Equipe} from '../models/equipe';
+import {Personnage} from '../models/personnage';
 
 @Injectable()
 export class GlobalService {
@@ -23,6 +24,9 @@ export class GlobalService {
   public joueursTeam1 = this.joueursTeam1Source.asObservable();
   private joueursTeam2Source: BehaviorSubject<Joueur[]> = new BehaviorSubject([]);
   public joueursTeam2 = this.joueursTeam2Source.asObservable();
+
+  private personnageSource: BehaviorSubject<Personnage[]> = new BehaviorSubject([]);
+  public personnages = this.personnageSource.asObservable();
 
   set me(user: User) {
     localStorage.setItem('account', JSON.stringify(user));
@@ -59,5 +63,11 @@ export class GlobalService {
     localStorage.setItem('equipe2', JSON.stringify(equipe));
     this.equipe2Source.next(equipe);
   }
+
+  set mepersonnages(perso: Personnage[]) {
+    localStorage.setItem('personnages', JSON.stringify(perso));
+    this.personnageSource.next(perso);
+  }
+
   constructor() {}
 }

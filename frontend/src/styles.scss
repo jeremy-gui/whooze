@@ -1,4 +1,11 @@
 @import "../static/fonts/fonts.scss";
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+
+$enable-responsive-font-sizes: true;
 
 @font-face {
   font-family: $font-family-brand;
@@ -13,5 +20,73 @@ body {
 }
 
 h1 {
-  font-size: 8vw;
+  @include responsive-font-size(8vw);
 }
+
+/* Breakpoint for extra-small viewport */
+@include media-breakpoint-up(xs) {
+  .input-group {
+    width: 75vw;
+  }
+  h2 {
+    position: absolute;
+    top:3vw;
+    margin-left: 15vw;
+  }
+
+}
+/* Breakpoint for small viewport */
+@include media-breakpoint-up(sm) {
+  .input-group {
+    width: 75vw;
+  }
+  h2 {
+    position: absolute;
+    top:3vw;
+    margin-left: 15vw;
+  }
+}
+/* Breakpoint for medium viewport */
+@include media-breakpoint-up(md) {
+  .input-group {
+    width: 50vw;
+  }
+  h2 {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Breakpoint for large viewport */
+@include media-breakpoint-up(lg) {
+  .input-group {
+    width: 50vw;
+  }
+  h2 {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+/* Breakpoint for extra-large viewport */
+@include media-breakpoint-up(xl) {
+  .input-group {
+    width: 50vw;
+  }
+  h2 {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+h2 {
+  @include responsive-font-size(3vw);
+}
+
+
+
+
+
+

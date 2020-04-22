@@ -135,6 +135,7 @@ export class NavbarComponent implements OnInit {
 
 
     logout() {
+    this._partieService.closeConnection();
     if (this.userSub) {
       this.userSub.unsubscribe();
     }
@@ -152,6 +153,9 @@ export class NavbarComponent implements OnInit {
     }
     if (this.joueursTeam2Sub) {
       this.joueursTeam2Sub.unsubscribe();
+    }
+    if (this.partieSub) {
+      this.partieSub.unsubscribe();
     }
 
     this._userService.logout();

@@ -14,7 +14,7 @@ export class Partie {
     Object.assign(this, init);
   }
   id: number;
-  StadePartieEnCours: StadePartieEnCours;
+  stadePartieEnCours: StadePartieEnCours;
   personnages: [];
   owner_id: number;
   code_unique: string;

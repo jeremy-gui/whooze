@@ -16,6 +16,7 @@ export class CustomValidators {
       return valid ? null : error;
     };
   }
+
   static passwordMatchValidator(control: AbstractControl) {
     const password: string = control.get('password').value; // get password from our password form control
     const confirmPassword: string = control.get('confirmPassword').value; // get password from our confirmPassword form control

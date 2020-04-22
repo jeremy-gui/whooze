@@ -7,5 +7,6 @@ export class Joueur {
   owner_id: number;
   partiencours: number;
   equipe_id: number;
+  readytostart: boolean = false;
 }
 
