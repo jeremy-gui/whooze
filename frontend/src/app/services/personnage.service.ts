@@ -1,8 +1,10 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {Joueur} from '../models/joueur';
 import {environment} from '../../environments/environment';
+import {Joueur} from '../models/joueur';
+import {stringify} from 'querystring';
+import {Personnage} from '../models/personnage';
 
 
 @Injectable()
@@ -27,6 +29,33 @@ export class PersonnageService {
     return this.http.delete(`${this.baseUrl}timesapp/personnage/${personnage.id}`,  this.httpOptions);
   }
 
+  public getPersonnageFromListOfJoueur(joueur: any): Observable<any> {
+    let myParams = new HttpParams();
+    myParams.set('playerowner', JSON.stringify(joueur));
+
+    return this.http.get(`${this.baseUrl}timesapp/personnage/`, { headers: this.httpOptions.headers, params: myParams });
+  }
+
+  public getPersonnageFromJoueur(joueur: Joueur): Observable<any> {
+    let myParams = new HttpParams();
+    myParams.set('playerowner', joueur.id.toString());
+
+    return this.http.get(`${this.baseUrl}timesapp/personnage/`, { headers: this.httpOptions.headers, params: myParams });
+  }
+/*
+  public  getPersoFromAllJouer(team): Observable<any> {
+    let listePersonnageComplete: Personnage[] = new Array();
+    team.forEach(j => {
+      this.getPersonnageFromJoueur(j).subscribe(el => {
+        let perso: Personnage = new Personnage();
+        perso.id = el.id;
+        perso.nom = el.nom;
+        perso.playerowner = j.id;
+        listePersonnageComplete.push(perso);
+      });
+    });
+  }
+*/
   public updatePartielPesonnage(personnage: any, param: any): Observable<any> {
     const body = JSON.stringify(param);
     return this.http.patch(`${this.baseUrl}timesapp/personnage/${personnage.id}`, body, this.httpOptions);

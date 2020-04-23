@@ -15,7 +15,6 @@ export class Partie {
   }
   id: number;
   stadePartieEnCours: StadePartieEnCours;
-  personnages: [];
   owner_id: number;
   code_unique: string;
 }

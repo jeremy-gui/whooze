@@ -28,6 +28,9 @@ export class GlobalService {
   private personnageSource: BehaviorSubject<Personnage[]> = new BehaviorSubject([]);
   public personnages = this.personnageSource.asObservable();
 
+  private personnagesCompleteSource: BehaviorSubject<Personnage[]> = new BehaviorSubject([]);
+  public personnagesComplete = this.personnagesCompleteSource.asObservable();
+
   set me(user: User) {
     localStorage.setItem('account', JSON.stringify(user));
     this.userSource.next(user);
@@ -67,6 +70,11 @@ export class GlobalService {
   set mepersonnages(perso: Personnage[]) {
     localStorage.setItem('personnages', JSON.stringify(perso));
     this.personnageSource.next(perso);
+  }
+
+  set melistepersonnagescomplete(perso: Personnage[]) {
+    localStorage.setItem('liste_personnages', JSON.stringify(perso));
+    this.personnagesCompleteSource.next(perso);
   }
 
   constructor() {}

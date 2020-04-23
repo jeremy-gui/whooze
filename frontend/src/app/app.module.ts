@@ -22,6 +22,7 @@ import {EquipeService} from './services/equipe.service';
 import { EntercodeComponent } from './entercode/entercode.component';
 import { CreatepersoComponent } from './createperso/createperso.component';
 import {PersonnageService} from './services/personnage.service';
+import { MancheComponent } from './manche/manche.component';
 
 @NgModule({
   declarations: [

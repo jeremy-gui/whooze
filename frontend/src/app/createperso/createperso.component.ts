@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {User} from '../models/user';
-import {Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, Subject, Subscription} from 'rxjs';
 import {Joueur} from '../models/joueur';
-import {Partie} from '../models/partie';
+import {Partie, StadePartieEnCours} from '../models/partie';
 import {CustomValidators} from '../utils/custom-validators';
 import {Equipe} from '../models/equipe';
 import {GlobalService} from '../services/global.service';
@@ -45,6 +45,8 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
 
   personnagesSub: Subscription;
   personnages: Personnage[] = new  Array();
+  personnagesCompleteSub: Subscription;
+  personnagesComplete: Personnage[] = new  Array();
 
   ready: boolean = false;
   erreurNbr: boolean = false;
@@ -55,14 +57,9 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
   ownercanstart: boolean = false;
   myteam: number;
 
-  baseUrl: string = environment.apiUrl;
   private httpOptions: any;
 
-  constructor(private formBuilder: FormBuilder, private global: GlobalService, public _personnageService: PersonnageService, public _userService: UserService, public _joueurService: JoueurService, public _partieService: PartieService, public _equipeService: EquipeService, private router: Router) {
-    this.httpOptions = {
-      headers: new HttpHeaders({'Content-Type': 'application/json'})
-    };
-  }
+  constructor(private formBuilder: FormBuilder, private global: GlobalService, public _personnageService: PersonnageService, public _userService: UserService, public _joueurService: JoueurService, public _partieService: PartieService, public _equipeService: EquipeService, private router: Router) { }
 
   ngOnInit(): void {
     if (localStorage.getItem('token') || localStorage.getItem('account')) {
@@ -122,6 +119,12 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     this.personnagesSub = this.global.personnages.subscribe(
       mepersonnages => this.personnages = mepersonnages
     );
+    if (localStorage.getItem('liste_personnages')) {
+      this.global.melistepersonnagescomplete = JSON.parse(localStorage.getItem('liste_personnages'));
+    }
+    this.personnagesCompleteSub = this.global.personnagesComplete.subscribe(
+      mepersonnagesComplete => this.personnagesComplete = mepersonnagesComplete
+    );
 
     this.connect(this.partie.code_unique);
     this.getTeam1();
@@ -157,6 +160,25 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
         this.verifOwnerCanStart();
 
       }
+      if (messages.message.requete === 'listepersocomplete') {
+        const listPersonnage = JSON.parse(messages.message.liste);
+        this.global.melistepersonnagescomplete = [];
+        listPersonnage.forEach(element => {
+          const p: Personnage = new Personnage();
+          p.id = element.pk;
+          p.playerowner = element.fields.playerowner;
+          p.nom = element.fields.nom;
+          this.personnagesComplete.push(p);
+        });
+        this.global.melistepersonnagescomplete = this.personnagesComplete;
+        this._partieService.send('', 'letsstartround1');
+      }
+      if (messages.message.requete === 'letsstartround1') {
+        const round1 = StadePartieEnCours.ROUND_1;
+        this.partie.stadePartieEnCours = round1;
+        this.global.megame = this.partie;
+        this.router.navigate(['manche']);
+      }
     });
   }
   verifOwnerCanStart() {
@@ -182,8 +204,9 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     }
   }
   startthegame() {
-    
+    this._partieService.send('', "listepersocomplete");
   }
+
   majTeam1(data: any) {
     this.global.joueurs_team1 = [];
     data.forEach(element => {
@@ -191,7 +214,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
       j.id = element.pk;
       j.equipe_id = element.fields.equipe_id;
       j.username = element.fields.username;
-      j.owner_id = element.fields.owner_id;
+      j.owner_id = element.fields.owner;
       j.partiencours = element.fields.partiencours;
       j.readytostart = element.fields.readytostart;
       this.joueursTeam1.push(j);
@@ -208,7 +231,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
       j.id = element.pk;
       j.equipe_id = element.fields.equipe_id;
       j.username = element.fields.username;
-      j.owner_id = element.fields.owner_id;
+      j.owner_id = element.fields.owner;
       j.partiencours = element.fields.partiencours;
       j.readytostart = element.fields.readytostart;
       this.joueursTeam2.push(j);
@@ -253,7 +276,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     } else if (!this.ErreurNombrePerso()) {
       let perso = new Personnage();
       perso.nom = this.f.nom.value;
-      perso.owner = this.account.id;
+      perso.playerowner = this.joueur.id;
       this._personnageService.createPersonnage(perso).subscribe(
         data => {
           perso.id = data.id;
@@ -313,5 +336,6 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     this.joueursTeam1Sub.unsubscribe();
     this.joueursTeam2Sub.unsubscribe();
     this.userSub.unsubscribe();
+    this.personnagesCompleteSub.unsubscribe();
   }
 }

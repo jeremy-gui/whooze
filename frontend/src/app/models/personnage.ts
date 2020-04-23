@@ -3,6 +3,6 @@ export class Personnage {
     Object.assign(this, init);
   }
   id: number;
-  owner: number;
+  playerowner: number;
   nom: string;
 }

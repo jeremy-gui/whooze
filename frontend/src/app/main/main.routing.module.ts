@@ -7,6 +7,7 @@ import  { ChooseusernameComponent } from '../chooseusername/chooseusername.compo
 import {CreateorjoinpartieComponent} from '../createorjoinpartie/createorjoinpartie.component';
 import {EntercodeComponent} from '../entercode/entercode.component';
 import {CreatepersoComponent} from '../createperso/createperso.component';
+import {MancheComponent} from '../manche/manche.component';
 
 const MAIN_ROUTES: Routes = [
     {
@@ -14,11 +15,12 @@ const MAIN_ROUTES: Routes = [
         component: MainComponent,
         children: [
             { path: '', component: HomeComponent },
-            { path: 'chooseusername', component: ChooseusernameComponent},
-            { path: 'creategame', component: CreateorjoinpartieComponent},
-            { path: 'entergamecode', component: EntercodeComponent},
-            { path: 'joingame', component: CreateorjoinpartieComponent},
-            { path: 'createperso', component: CreatepersoComponent},
+          { path: 'chooseusername', component: ChooseusernameComponent},
+          { path: 'creategame', component: CreateorjoinpartieComponent},
+          { path: 'entergamecode', component: EntercodeComponent},
+          { path: 'joingame', component: CreateorjoinpartieComponent},
+          { path: 'createperso', component: CreatepersoComponent},
+          { path: 'manche', component: MancheComponent},
         ]
     }
 ];
