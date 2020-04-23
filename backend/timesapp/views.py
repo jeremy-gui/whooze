@@ -195,10 +195,12 @@ class PersonnageDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Personnage.objects.all()
     serializer_class = personnageSerializer
 
+
 class PersonnageList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     queryset = Personnage.objects.all()
     serializer_class = personnageSerializer
+
 
 class UpdateEquipeView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticated,)

@@ -57,13 +57,6 @@ class User(AbstractUser):
     objects = UserManager()
 
 
-class Personnage(models.Model):
-    nom = models.CharField(max_length=300)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='personnageowner', blank=True, null=True,
-                              on_delete=models.SET_NULL)
-
-    def __str__(self):
-        return self.nom
 
 class Partie(models.Model):
     CREATE_TEAMS = 'CREATE_TEAMS'
@@ -81,7 +74,6 @@ class Partie(models.Model):
         (COMPLETED, COMPLETED),
     )
     stadePartieEnCours = models.CharField(max_length=20, choices=STATUSES, default=CREATE_TEAMS)
-    listePersonnages = models.ManyToManyField(Personnage, related_name='personnages', blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='partieowner', blank=True, null=True, on_delete=models.SET_NULL)
     code_unique = models.CharField(max_length=6, blank=True, null=True)
 
@@ -117,6 +109,14 @@ class Joueur(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class Personnage(models.Model):
+    nom = models.CharField(max_length=300)
+    playerowner = models.ForeignKey(Joueur, related_name='personnageowner', blank=True, null=True,
+                              on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.nom
 
 class JoueurManager():
 

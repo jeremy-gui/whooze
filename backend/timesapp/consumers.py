@@ -7,7 +7,7 @@ from djangochannelsrestframework.consumers import AsyncAPIConsumer
 from django.core import serializers
 from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
 
-from timesapp.models import Partie, Joueur, Equipe, User
+from timesapp.models import Partie, Joueur, Equipe, User, Personnage
 from timesapp.serializers import userSerializer, joueurSerializer, partieSerializer
 
 
@@ -122,6 +122,18 @@ class PartieConsumer(AsyncAPIConsumer):
         return players
 
     @database_sync_to_async
+    def getAllPersonnageFromTeams(self, playersTeam1, playersTeam2):
+
+        listcomplete = json.loads(playersTeam1) + json.loads(playersTeam2)
+
+        listofIds = []
+        for jId in listcomplete:
+            listofIds.append(jId['pk'])
+
+        list = Personnage.objects.filter(playerowner__in=Joueur.objects.filter(pk__in=listofIds))
+        return serializers.serialize("json", list)
+
+    @database_sync_to_async
     def getCurrentPlayer(self):
         user = User.objects.get(pk=self.scope['user'].id)
         joueur = Joueur.objects.filter(partiencours=self.scope['partie'], owner=user.id)
@@ -143,6 +155,13 @@ class PartieConsumer(AsyncAPIConsumer):
     @database_sync_to_async
     def letsCreatePerso(self, partie):
         Partie.objects.filter(id=partie.id).update(stadePartieEnCours=partie.CHOOSE_PERSO)
+        data = Partie.objects.filter(id=partie.id)
+        self.scope['partie'] = data
+        return  serializers.serialize("json", data)
+
+    @database_sync_to_async
+    def letsStartTheGame(self, partie):
+        Partie.objects.filter(id=partie.id).update(stadePartieEnCours=partie.ROUND_1)
         data = Partie.objects.filter(id=partie.id)
         self.scope['partie'] = data
         return  serializers.serialize("json", data)
@@ -187,6 +206,24 @@ class PartieConsumer(AsyncAPIConsumer):
                         'message': tobesend
                     },
                 )
+
+            if (requete == 'letsstartround1'):
+                await self.getPartie()
+                updatedpartie = await self.letsStartTheGame(self.scope['partie'])
+
+                data = {}
+                data["requete"] = requete
+                data["majpartie"] = updatedpartie
+                tobesend = data
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': tobesend
+                    },
+                )
+
             if (requete == 'letscreateperso') :
                 await self.getPartie()
                 updatedpartie = await self.letsCreatePerso(self.scope['partie'])
@@ -227,6 +264,23 @@ class PartieConsumer(AsyncAPIConsumer):
                     },
                 )
 
+            if (requete == 'listepersocomplete'):
+                await self.getPartie()
+                await self.getCurrentPlayer()
+                playersTeam1 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+                playersTeam2 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+                data = {}
+                data["requete"] = requete
+                data["liste"] = await self.getAllPersonnageFromTeams(playersTeam1, playersTeam2)
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+
             if (requete == 'message') :
                 tellme = user.email + " say : " + message
                 data = {}
@@ -241,6 +295,7 @@ class PartieConsumer(AsyncAPIConsumer):
                         'message': tobesend
                     },
                 )
+
         else :
             """
             test envoi message chat avec controle token
