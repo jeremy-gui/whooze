@@ -84,6 +84,7 @@ class Partie(models.Model):
 class Equipe(models.Model):
     nom = models.CharField(max_length=200, blank=True, null=True)
     partie_id = models.ForeignKey(Partie, related_name='partie_equipe', blank=True, null=True, on_delete=models.SET_NULL)
+    score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.nom

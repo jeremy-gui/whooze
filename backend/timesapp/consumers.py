@@ -12,6 +12,12 @@ from timesapp.serializers import userSerializer, joueurSerializer, partieSeriali
 
 
 class PartieConsumer(AsyncAPIConsumer):
+    currentround = 0
+    indexJoueurEquipe1 = 0
+    indexJoueurEquipe2 = 0
+    currentteam = 1
+    prochainJoueur = ""
+
     async def connect(self):
 
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -106,6 +112,25 @@ class PartieConsumer(AsyncAPIConsumer):
         return valid_data
 
     @database_sync_to_async
+    def majScoreT1(self, idPartie, data):
+        score = len(data)
+        equipe = Equipe.objects.get(partie_id=idPartie, nom='1')
+        Equipe.objects.filter(pk=equipe.pk).update(score=score)
+        equipe = Equipe.objects.get(partie_id=idPartie, nom='1')
+        self.scope['equipe1'] = equipe
+
+        return data
+
+    @database_sync_to_async
+    def majScoreT2(self, idPartie, data):
+        score = len(data)
+        equipe = Equipe.objects.get(partie_id=idPartie, nom='2')
+        Equipe.objects.filter(pk=equipe.pk).update(score=score)
+        equipe = Equipe.objects.get(partie_id=idPartie, nom='1')
+        self.scope['equipe2'] = equipe
+
+        return data
+    @database_sync_to_async
     def getAllPlayerOfEquipe1(self, idPartie):
         equipe = Equipe.objects.get(partie_id=idPartie, nom='1')
         self.scope['equipe1'] = equipe
@@ -168,8 +193,10 @@ class PartieConsumer(AsyncAPIConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        print(text_data_json['requete'])
         message = text_data_json['message']
         requete = text_data_json['requete']
+
         user = self.scope['user']
 
         # Send message to room group
@@ -210,10 +237,49 @@ class PartieConsumer(AsyncAPIConsumer):
             if (requete == 'letsstartround1'):
                 await self.getPartie()
                 updatedpartie = await self.letsStartTheGame(self.scope['partie'])
-
                 data = {}
                 data["requete"] = requete
                 data["majpartie"] = updatedpartie
+                tobesend = data
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': tobesend
+                    },
+                )
+            if (requete == 'getnextplayer'):
+                await self.getPartie()
+                self.playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+                self.playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+                jteam1 = json.loads(self.playersTeam1)
+                jteam2 = json.loads(self.playersTeam2)
+                prochainjoueur = ""
+                if (message=='0'):
+                    self.indexJoueurEquipe1 = 0
+                    self.indexJoueurEquipe2 = 0
+                    self.currentteam = 1
+                    prochainjoueur = jteam1[self.indexJoueurEquipe1]
+
+                else :
+                    if (message['currentround'] == 1):
+                        if (message['currentteam'] == 1):
+                            self.indexJoueurEquipe1 = message['indexJoueurEquipe1']+1
+                            self.currentteam = 2
+                            prochainjoueur = jteam2[message['indexJoueurEquipe2']]
+                        elif (message['currentteam'] == 2):
+                            self.indexJoueurEquipe2 = message['indexJoueurEquipe2'] + 1
+                            self.currentteam = 1
+                            prochainjoueur = jteam1[message['indexJoueurEquipe1']]
+
+
+                print(prochainjoueur)
+                data = {}
+                data["requete"] = requete
+                data["quijoue"] = prochainjoueur
+                data["indexJoueurEquipe1"] = self.indexJoueurEquipe1
+                data["indexJoueurEquipe2"] = self.indexJoueurEquipe2
                 tobesend = data
 
                 await self.channel_layer.group_send(
@@ -267,8 +333,8 @@ class PartieConsumer(AsyncAPIConsumer):
             if (requete == 'listepersocomplete'):
                 await self.getPartie()
                 await self.getCurrentPlayer()
-                playersTeam1 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
-                playersTeam2 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+                playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+                playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
                 data = {}
                 data["requete"] = requete
                 data["liste"] = await self.getAllPersonnageFromTeams(playersTeam1, playersTeam2)
@@ -280,6 +346,62 @@ class PartieConsumer(AsyncAPIConsumer):
                         'message': data
                     },
                 )
+            if (requete == 'startround1'):
+                await self.getPartie()
+                await self.getCurrentPlayer()
+                playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+                playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+                self.currentround = 1
+                data = {}
+                data["requete"] = requete
+                data["data"] = message
+                print(message)
+                self.scope["listepersonnage"] = await self.getAllPersonnageFromTeams(playersTeam1, playersTeam2)
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+            if (requete == 'majScoret1'):
+                await self.getPartie()
+                await self.majScoreT1(self.scope['partie'], message)
+                data = {}
+                data["requete"] = requete
+                data["score1"] = message
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+            if (requete == 'majScoret2'):
+                await self.majScoreT2(self.scope['partie'], message)
+                data = {}
+                data["requete"] = requete
+                data["score2"] = message
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+            if (requete == 'nextplayersameround'):
+                data = {}
+                data["requete"] = requete
+                data["data"] = message
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+
 
             if (requete == 'message') :
                 tellme = user.email + " say : " + message
