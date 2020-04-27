@@ -23,6 +23,7 @@ import { EntercodeComponent } from './entercode/entercode.component';
 import { CreatepersoComponent } from './createperso/createperso.component';
 import {PersonnageService} from './services/personnage.service';
 import { MancheComponent } from './manche/manche.component';
+import {MancheService} from './services/manche.service';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,7 @@ import { MancheComponent } from './manche/manche.component';
     ReactiveFormsModule,
     MainModule
   ],
-  providers: [UserService, GlobalService, JoueurService, PartieService, EquipeService, PersonnageService,
+  providers: [UserService, GlobalService, JoueurService, PartieService, EquipeService, PersonnageService, MancheService,
       { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })

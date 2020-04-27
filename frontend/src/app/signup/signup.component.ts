@@ -22,6 +22,13 @@ export class SignupComponent implements OnInit {
   constructor(private formBuilder: FormBuilder, private global: GlobalService, public _userService: UserService, private router: Router) { }
 
   ngOnInit(): void {
+    if (localStorage.getItem('cantcomeback') === 'true') {
+      if (localStorage.getItem('manchestarted')) {
+        console.log("test");
+        localStorage.setItem('cantcomeback', 'false');
+        this.router.navigate(['manche']);
+      }
+    }
     this.user = new User();
     this.title = environment.title;
     this.registerForm = this.formBuilder.group({

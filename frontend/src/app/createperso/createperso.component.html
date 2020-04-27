@@ -1,4 +1,4 @@
-<h2 class="text-center mb-5">Enter 10 names of well-known characters, celebrities...</h2>
+<h2 class="text-center mb-5 title-custom">Enter 10 names of well-known characters, celebrities...</h2>
 <div class="container justify-content-center">
 <div class="justify-content-center">
   <!-- method 3 with cards  -->
@@ -17,7 +17,7 @@
       <button type="submit" *ngIf="!this.ready && !this.joueur.readytostart"  class="btn btn-primary">add</button>
         <button *ngIf="this.ready && !this.joueur.readytostart" type="button" (click)="readytoplay()"  class="btn btn-primary ml-5" >I'm ready to play !</button>
         <button *ngIf="this.joueur.readytostart" type="button" (click)="readytoplay(true)"  class="btn btn-danger ml-5" >I'm not ready...</button>
-        <button *ngIf="this.ownercanstart" type="button" (click)="startthegame()"  class="btn btn-danger ml-5" >Let's play !</button>
+        <button *ngIf="this.ownercanstart" type="button" (click)="startthegame()"  class="btn btn-primary ml-5" >Let's play !</button>
       </div>
       <div *ngIf="submitted && f.nom.errors" class="invalid-feedback mb-4">
         <div *ngIf="f.nom.errors.required">A name is required</div>

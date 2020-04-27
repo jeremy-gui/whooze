@@ -23,16 +23,24 @@ h1 {
   @include responsive-font-size(8vw);
 }
 
+.title-custom {
+  position: static;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
 /* Breakpoint for extra-small viewport */
 @include media-breakpoint-up(xs) {
   .input-group {
     width: 75vw;
   }
-  h2 {
+  .title-custom {
     position: absolute;
-    top:3vw;
+    top:2vw;
     margin-left: 15vw;
     text-align: left;
+    width: 70vw
   }
 
 }
@@ -41,10 +49,12 @@ h1 {
   .input-group {
     width: 75vw;
   }
-  h2 {
+  .title-custom {
     position: absolute;
-    top:3vw;
+    top:2vw;
     margin-left: 15vw;
+    text-align: left;
+    width: 70vw
   }
 }
 /* Breakpoint for medium viewport */
@@ -52,10 +62,11 @@ h1 {
   .input-group {
     width: 50vw;
   }
-  h2 {
+  .title-custom {
     position: static;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
   }
 }
 
@@ -64,10 +75,11 @@ h1 {
   .input-group {
     width: 50vw;
   }
-  h2 {
+  .title-custom {
     position: static;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
   }
 }
 /* Breakpoint for extra-large viewport */
@@ -75,15 +87,16 @@ h1 {
   .input-group {
     width: 50vw;
   }
-  h2 {
+  .title-custom {
     position: static;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
   }
 }
 
 h2 {
-  @include responsive-font-size(3vw);
+  @include responsive-font-size(4vw);
 }
 
 

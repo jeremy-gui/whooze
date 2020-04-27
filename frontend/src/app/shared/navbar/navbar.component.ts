@@ -48,7 +48,12 @@ export class NavbarComponent implements OnInit {
 
 
   ngOnInit() {
-
+    if (localStorage.getItem('cantcomeback') === 'true') {
+      if (localStorage.getItem('manchestarted')) {
+        localStorage.setItem('cantcomeback', 'false');
+        this.router.navigate(['manche']);
+      }
+    }
     if (history.state.data && history.state.data.registerOk)    {
       this.message = 'Thank you for suscribing ! Now let\'s play tooooo ';
       history.state.data.registerOk = false;
@@ -158,6 +163,7 @@ export class NavbarComponent implements OnInit {
       this.partieSub.unsubscribe();
     }
 
+    localStorage.setItem('cantcomeback', 'false');
     this._userService.logout();
     this.router.navigate(['/']);
   }

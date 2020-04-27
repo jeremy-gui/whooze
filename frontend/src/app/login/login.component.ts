@@ -25,6 +25,13 @@ export class LoginComponent implements OnInit {
                ) { }
 
   ngOnInit(): void {
+    if (localStorage.getItem('cantcomeback') === 'true') {
+      if (localStorage.getItem('manchestarted')) {
+        console.log("test");
+        localStorage.setItem('cantcomeback', 'false');
+        this.router.navigate(['manche']);
+      }
+    }
     this.loading = false;
     this.title = environment.title;
     this.loginForm = this.fb.group({

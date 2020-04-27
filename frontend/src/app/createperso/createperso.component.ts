@@ -122,10 +122,15 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     if (localStorage.getItem('liste_personnages')) {
       this.global.melistepersonnagescomplete = JSON.parse(localStorage.getItem('liste_personnages'));
     }
+    if (environment.debug === true) {
+
+    }
     this.personnagesCompleteSub = this.global.personnagesComplete.subscribe(
       mepersonnagesComplete => this.personnagesComplete = mepersonnagesComplete
     );
+    if (environment.debug === true) {
 
+    }
     this.connect(this.partie.code_unique);
     this.getTeam1();
     this.getTeam2();

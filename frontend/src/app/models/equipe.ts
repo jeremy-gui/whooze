@@ -3,7 +3,8 @@ export class Equipe {
     Object.assign(this, init);
   }
   id: number;
-  name: string;
+  nom: string;
   partie_id: number;
+  score: number;
 }
 
