@@ -498,6 +498,7 @@ export class MancheComponent implements OnInit, OnDestroy {
       this.indexJoueurEquipe1Sub.unsubscribe();
       this.indexJoueurEquipe2Sub.unsubscribe();
       this.timeLeftSub.unsubscribe();
+      localStorage.setItem('jairecharge', 'true');
     //  localStorage.setItem('cantcomeback', 'true');
   }
 
