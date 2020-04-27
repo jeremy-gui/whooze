@@ -14,7 +14,6 @@ import {EquipeService} from '../services/equipe.service';
 import {Router} from '@angular/router';
 import {takeUntil} from 'rxjs/operators';
 import {MancheService} from '../services/manche.service';
-import {toNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 
 @Component({
   selector: 'app-manche',
@@ -499,7 +498,6 @@ export class MancheComponent implements OnInit, OnDestroy {
       this.indexJoueurEquipe1Sub.unsubscribe();
       this.indexJoueurEquipe2Sub.unsubscribe();
       this.timeLeftSub.unsubscribe();
-      localStorage.setItem('jairecharge', 'true');
     //  localStorage.setItem('cantcomeback', 'true');
   }
 
