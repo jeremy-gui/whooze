@@ -43,8 +43,16 @@ export class MancheService {
   private joueursTeamSource: BehaviorSubject<Joueur[]> = new BehaviorSubject([]);
   public joueursTeamTemp = this.joueursTeamSource.asObservable();
 
+  private afficheInterRoundSource: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public afficheInterRound = this.afficheInterRoundSource.asObservable();
+
   private timerSource: BehaviorSubject<number> = new BehaviorSubject(0);
   public timer = this.timerSource.asObservable();
+
+  set affichageInterRound(affichage: boolean) {
+    localStorage.setItem('afficheinterround', JSON.stringify(affichage));
+    this.afficheInterRoundSource.next(affichage);
+  }
 
   set joueurs_teamComplete(joueur: Joueur[]) {
     localStorage.setItem('joueurs_teamComplete', JSON.stringify(joueur));
