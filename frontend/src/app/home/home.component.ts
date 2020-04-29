@@ -21,7 +21,6 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     if (localStorage.getItem('cantcomeback') === 'true') {
       if (localStorage.getItem('manchestarted')) {
-        console.log("test");
         localStorage.setItem('cantcomeback', 'false');
         this.router.navigate(['manche']);
       }

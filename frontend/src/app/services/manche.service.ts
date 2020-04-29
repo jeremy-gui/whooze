@@ -38,8 +38,23 @@ export class MancheService {
   private indexJoueurEquipe2Source: BehaviorSubject<number> = new BehaviorSubject(0);
   public indexJoueurEquipe2 = this.indexJoueurEquipe2Source.asObservable();
 
+  private joueursTeamCompleteSource: BehaviorSubject<Joueur[]> = new BehaviorSubject([]);
+  public joueursTeamComplete = this.joueursTeamCompleteSource.asObservable();
+  private joueursTeamSource: BehaviorSubject<Joueur[]> = new BehaviorSubject([]);
+  public joueursTeamTemp = this.joueursTeamSource.asObservable();
+
   private timerSource: BehaviorSubject<number> = new BehaviorSubject(0);
   public timer = this.timerSource.asObservable();
+
+  set joueurs_teamComplete(joueur: Joueur[]) {
+    localStorage.setItem('joueurs_teamComplete', JSON.stringify(joueur));
+    this.joueursTeamCompleteSource.next(joueur);
+  }
+
+  set joueurs_teamTemp(joueur: Joueur[]) {
+    localStorage.setItem('joueurs_teamTemp', JSON.stringify(joueur));
+    this.joueursTeamSource.next(joueur);
+  }
 
   set timerseconde(time: number) {
     localStorage.setItem('timer', time.toString());

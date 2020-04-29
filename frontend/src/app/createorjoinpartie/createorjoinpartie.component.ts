@@ -310,11 +310,16 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   }
 
   StartGame() {
+    let error = false;
     if ((this.joueursTeam1.length + this.joueursTeam2.length) < 4) {
         this.messageErreur = 'The number of players must be at least 4';
+        error = true;
     } else if (this.joueursTeam1.length < 2 || this.joueursTeam2.length < 2) {
         this.messageErreur = 'The number of players per team must be at least 2';
+        error = true;
     }
-    this._partieService.send('', 'letscreateperso');
+    if (!error) {
+      this._partieService.send('', 'letscreateperso');
+    }
   }
 }
