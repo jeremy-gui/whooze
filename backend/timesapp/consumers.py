@@ -251,32 +251,69 @@ class PartieConsumer(AsyncAPIConsumer):
                         'message': tobesend
                     },
                 )
+            if (requete == 'nextround'):
+                await self.getPartie()
+                prochainjoueur = ''
+
+                self.currentround = message["currentround"]+1
+                teamTemp = message['jteamtemp']
+                jteamcomplete = message['jteamcomplete']
+                self.indexJoueurEquipe1 = message['indexJoueurEquipe1']
+                del teamTemp[self.indexJoueurEquipe1]
+                if (len(teamTemp) == 0):
+                    teamTemp = jteamcomplete
+                    self.indexJoueurEquipe1 = 0
+
+                prochainjoueur = teamTemp[self.indexJoueurEquipe1]
+
+                data = {}
+                data["requete"] = requete
+                data["quijoue"] = prochainjoueur
+                data["listePersonnageToGuess"] = message['liste_personnages']
+                data["currentteam"] = self.currentteam
+                data["currentround"] = self.currentround
+                data["indexJoueurEquipe1"] = self.indexJoueurEquipe1
+                data["jteamcomplete"] = jteamcomplete
+                data["jteamtemp"] = teamTemp
+                data["liste_personnages"] = message["liste_personnages"]
+                tobesend = data
+
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': tobesend
+                    },
+                )
             if (requete == 'getnextplayer'):
                 await self.getPartie()
                 self.playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
                 self.playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
                 jteam1 = json.loads(self.playersTeam1)
-                values = jteam1.values()  # List of values
-                shuffle(values)  # Shuffles in-place
+                jteam2 = json.loads(self.playersTeam2)
+                """
+                values = jteam1.values()
+                shuffle(values)
                 a = 0
                 for value in values:
                     jteam1[a] = value
 
-                print(jteam1)
-                jteam2 = json.loads(self.playersTeam2)
-                values = jteam1.values()  # List of values
-                shuffle(values)  # Shuffles in-place
+                
+                values = jteam2.values()
+                shuffle(values)
                 a = 0
                 for value in values:
-                    jteam1[a] = value
+                    jteam2[a] = value
+                """
+
+                shuffle(jteam1)
+                shuffle(jteam2)
+
                 jteamcomplete = []
 
                 if (message=='0'):
                     self.indexJoueurEquipe1 = 0
-                    self.indexJoueurEquipe2 = 0
                     self.currentteam = 1
-
-                    self.indexJoueurEquipe1 = 0
 
                     x = max(len(jteam1), len(jteam2))
                     jt1 = len(jteam1)
@@ -301,7 +338,6 @@ class PartieConsumer(AsyncAPIConsumer):
                 data["requete"] = requete
                 data["quijoue"] = jteamcomplete[0]
                 data["indexJoueurEquipe1"] = self.indexJoueurEquipe1
-                data["indexJoueurEquipe2"] = self.indexJoueurEquipe2
                 data["jteamcomplete"] = jteamcomplete
                 data["jteamtemp"] = jteamcomplete
                 tobesend = data
@@ -378,7 +414,6 @@ class PartieConsumer(AsyncAPIConsumer):
                 data = {}
                 data["requete"] = requete
                 data["data"] = message
-                print(message)
                 self.scope["listepersonnage"] = await self.getAllPersonnageFromTeams(playersTeam1, playersTeam2)
 
                 await self.channel_layer.group_send(
@@ -402,6 +437,7 @@ class PartieConsumer(AsyncAPIConsumer):
                     },
                 )
             if (requete == 'majScoret2'):
+                await self.getPartie()
                 await self.majScoreT2(self.scope['partie'], message)
                 data = {}
                 data["requete"] = requete
@@ -415,12 +451,6 @@ class PartieConsumer(AsyncAPIConsumer):
                 )
             if (requete == 'nextplayersameround'):
                 await self.getPartie()
-                self.playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
-                self.playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
-
-                jteam1 = json.loads(self.playersTeam1)
-                jteam2 = json.loads(self.playersTeam2)
-
                 prochainjoueur = ''
 
                 teamTemp = message['jteamtemp']
@@ -439,12 +469,12 @@ class PartieConsumer(AsyncAPIConsumer):
                 data["requete"] = requete
                 data["quijoue"] = prochainjoueur
                 data["listePersonnageToGuess"] = message['listePersonnageToGuess']
-                data["currentteam"] = self.currentteam
-                data["currentround"] = self.currentround
+                data["currentteam"] = message['currentteam']
+                data["currentround"] = message['currentround']
                 data["indexJoueurEquipe1"] = self.indexJoueurEquipe1
-                data["indexJoueurEquipe2"] = self.indexJoueurEquipe2
                 data["jteamcomplete"] = jteamcomplete
                 data["jteamtemp"] = teamTemp
+                data["liste_personnages"] = message["liste_personnages"]
                 tobesend = data
 
                 await self.channel_layer.group_send(
