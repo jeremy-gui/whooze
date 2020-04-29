@@ -1,4 +1,6 @@
 import json
+from random import shuffle
+
 from channels.auth import login
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
@@ -196,7 +198,7 @@ class PartieConsumer(AsyncAPIConsumer):
         print(text_data_json['requete'])
         message = text_data_json['message']
         requete = text_data_json['requete']
-
+        print(text_data_json['message'])
         user = self.scope['user']
 
         # Send message to room group
@@ -254,34 +256,55 @@ class PartieConsumer(AsyncAPIConsumer):
                 self.playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
                 self.playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
                 jteam1 = json.loads(self.playersTeam1)
+                values = jteam1.values()  # List of values
+                shuffle(values)  # Shuffles in-place
+                a = 0
+                for value in values:
+                    jteam1[a] = value
+
+                print(jteam1)
                 jteam2 = json.loads(self.playersTeam2)
-                prochainjoueur = ""
+                values = jteam1.values()  # List of values
+                shuffle(values)  # Shuffles in-place
+                a = 0
+                for value in values:
+                    jteam1[a] = value
+                jteamcomplete = []
+
                 if (message=='0'):
                     self.indexJoueurEquipe1 = 0
                     self.indexJoueurEquipe2 = 0
                     self.currentteam = 1
-                    prochainjoueur = jteam1[self.indexJoueurEquipe1]
 
-                else :
-                    if (message['currentround'] == 1):
-                        if (message['currentteam'] == 1):
-                            self.indexJoueurEquipe1 = message['indexJoueurEquipe1']+1
-                            self.currentteam = 2
-                            prochainjoueur = jteam2[message['indexJoueurEquipe2']]
-                        elif (message['currentteam'] == 2):
-                            self.indexJoueurEquipe2 = message['indexJoueurEquipe2'] + 1
-                            self.currentteam = 1
-                            prochainjoueur = jteam1[message['indexJoueurEquipe1']]
+                    self.indexJoueurEquipe1 = 0
+
+                    x = max(len(jteam1), len(jteam2))
+                    jt1 = len(jteam1)
+                    jt2 = len(jteam2)
+                    z = 0
+
+                    while x > 0:
+                        if(jt1 > 0):
+                            jteamcomplete.append(jteam1[z])
+                            jt1 -= 1
+                        if (jt2 > 0):
+                            jteamcomplete.append(jteam2[z])
+                            jt2 -= 1
+
+                        z += 1
+                        x -= 1
+
+                    print(jteamcomplete)
 
 
-                print(prochainjoueur)
                 data = {}
                 data["requete"] = requete
-                data["quijoue"] = prochainjoueur
+                data["quijoue"] = jteamcomplete[0]
                 data["indexJoueurEquipe1"] = self.indexJoueurEquipe1
                 data["indexJoueurEquipe2"] = self.indexJoueurEquipe2
+                data["jteamcomplete"] = jteamcomplete
+                data["jteamtemp"] = jteamcomplete
                 tobesend = data
-
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
@@ -391,17 +414,46 @@ class PartieConsumer(AsyncAPIConsumer):
                     },
                 )
             if (requete == 'nextplayersameround'):
+                await self.getPartie()
+                self.playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
+                self.playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
+
+                jteam1 = json.loads(self.playersTeam1)
+                jteam2 = json.loads(self.playersTeam2)
+
+                prochainjoueur = ''
+
+                teamTemp = message['jteamtemp']
+                jteamcomplete = message['jteamcomplete']
+                self.indexJoueurEquipe1 = message['indexJoueurEquipe1']
+                del teamTemp[self.indexJoueurEquipe1]
+                if (len(teamTemp) == 0):
+                    teamTemp = jteamcomplete
+                    self.indexJoueurEquipe1 = 0
+
+                prochainjoueur = teamTemp[self.indexJoueurEquipe1]
+
+
+
                 data = {}
                 data["requete"] = requete
-                data["data"] = message
+                data["quijoue"] = prochainjoueur
+                data["listePersonnageToGuess"] = message['listePersonnageToGuess']
+                data["currentteam"] = self.currentteam
+                data["currentround"] = self.currentround
+                data["indexJoueurEquipe1"] = self.indexJoueurEquipe1
+                data["indexJoueurEquipe2"] = self.indexJoueurEquipe2
+                data["jteamcomplete"] = jteamcomplete
+                data["jteamtemp"] = teamTemp
+                tobesend = data
+
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
                         'type': 'chat_message',
-                        'message': data
+                        'message': tobesend
                     },
                 )
-
 
             if (requete == 'message') :
                 tellme = user.email + " say : " + message
