@@ -8,6 +8,7 @@ import {CreateorjoinpartieComponent} from '../createorjoinpartie/createorjoinpar
 import {EntercodeComponent} from '../entercode/entercode.component';
 import {CreatepersoComponent} from '../createperso/createperso.component';
 import {MancheComponent} from '../manche/manche.component';
+import {TheendComponent} from '../theend/theend.component';
 
 const MAIN_ROUTES: Routes = [
     {
@@ -21,6 +22,7 @@ const MAIN_ROUTES: Routes = [
           { path: 'joingame', component: CreateorjoinpartieComponent},
           { path: 'createperso', component: CreatepersoComponent},
           { path: 'manche', component: MancheComponent},
+          { path: 'theend', component: TheendComponent},
         ]
     }
 ];

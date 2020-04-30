@@ -24,6 +24,7 @@ import { CreatepersoComponent } from './createperso/createperso.component';
 import {PersonnageService} from './services/personnage.service';
 import { MancheComponent } from './manche/manche.component';
 import {MancheService} from './services/manche.service';
+import { TheendComponent } from './theend/theend.component';
 
 @NgModule({
   declarations: [

@@ -314,8 +314,19 @@ export class MancheComponent implements OnInit, OnDestroy {
         this._partieService.send(this.listePersonnageGoodT2,"majScoret2");
       }
       if ((this.mancheEnCours +  1) === 4) {
-        //stop
         this.pause();
+        const data = {};
+        data["egalite"] = false;
+        data["score2"] = this.listePersonnageGoodT2.length;
+        data["score1"] = this.listePersonnageGoodT1.length;
+        if (data["score1"] > data["score2"]) {
+          data["equipegagnante"] = this.equipe1;
+        } else if (data["score2"] > data["score1"]) {
+          data["equipegagnante"] = this.equipe2;
+        } else if (data["score1"] === data["score2"]) {
+          data["egalite"] = true;
+        }
+        this._partieService.send(data, "theend");
       }
       else {
         const data = {};
@@ -345,20 +356,10 @@ export class MancheComponent implements OnInit, OnDestroy {
 
   startround() {
 
-    if (this.afficheScore && !this.afficheInterround) {
+    if (this.listePersonnageToGuess.length > 0) {
       this._partieService.send(this.listePersonnageToGuess, 'startround1');
-    } else if (!this.afficheScore && !this.mancheStarted && !this.afficheInterround) {
+    } else if (this.listePersonnageToGuess.length === 0) {
       this._partieService.send('', 'startround1');
-    } else if (this.afficheScore && this.afficheInterround) {
-      const data = {};
-      data["listePersonnageToGuess"] = this.listePersonnageToGuess;
-      data["indexJoueurEquipe1"] = this.indexJoueurEquipe1;
-      data["currentteam"] = this.equipeEnCours.nom;
-      data["currentround"] = this.mancheEnCours;
-      data["jteamcomplete"] = this.joueursTeamComplete;
-      data["jteamtemp"] = this.joueursTeamTemp;
-      data["liste_personnages"] = this.personnagesComplete;
-      this._partieService.send(this.listePersonnageToGuess, 'nextplayersameround');
     }
   }
   connect(code) {
@@ -389,6 +390,7 @@ export class MancheComponent implements OnInit, OnDestroy {
 
         this.manche.affichageScore = false;
         this.manche.manchestart = true;
+        this.manche.affichageInterRound = false;
         this.manche.timerseconde = 30;
 
         this.indexOfProchainPersonnage = 0;
