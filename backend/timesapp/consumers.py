@@ -410,7 +410,6 @@ class PartieConsumer(AsyncAPIConsumer):
                 await self.getCurrentPlayer()
                 playersTeam2 = await self.getAllPlayerOfEquipe2(self.scope['partie'])
                 playersTeam1 = await self.getAllPlayerOfEquipe1(self.scope['partie'])
-                self.currentround = 1
                 data = {}
                 data["requete"] = requete
                 data["data"] = message
@@ -442,6 +441,18 @@ class PartieConsumer(AsyncAPIConsumer):
                 data = {}
                 data["requete"] = requete
                 data["score2"] = message
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': data
+                    },
+                )
+            if (requete == 'theend'):
+                await self.getPartie()
+                data = {}
+                data["requete"] = requete
+                data["data"] = message
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
