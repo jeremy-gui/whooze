@@ -456,7 +456,7 @@ class PartieConsumer(AsyncAPIConsumer):
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
-                        'type': 'chat_message', 
+                        'type': 'chat_message',
                         'message': data
                     },
                 )
