@@ -22,25 +22,25 @@ export class PersonnageService {
   }
 
   public createPersonnage(personnage: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}timesapp/personnage/`, JSON.stringify(personnage), this.httpOptions);
+    return this.http.post(`${this.baseUrl}personnage/`, JSON.stringify(personnage), this.httpOptions);
   }
 
   public deletePersonnage(personnage: any): Observable<any> {
-    return this.http.delete(`${this.baseUrl}timesapp/personnage/${personnage.id}`,  this.httpOptions);
+    return this.http.delete(`${this.baseUrl}personnage/${personnage.id}`,  this.httpOptions);
   }
 
   public getPersonnageFromListOfJoueur(joueur: any): Observable<any> {
     let myParams = new HttpParams();
     myParams.set('playerowner', JSON.stringify(joueur));
 
-    return this.http.get(`${this.baseUrl}timesapp/personnage/`, { headers: this.httpOptions.headers, params: myParams });
+    return this.http.get(`${this.baseUrl}personnage/`, { headers: this.httpOptions.headers, params: myParams });
   }
 
   public getPersonnageFromJoueur(joueur: Joueur): Observable<any> {
     let myParams = new HttpParams();
     myParams.set('playerowner', joueur.id.toString());
 
-    return this.http.get(`${this.baseUrl}timesapp/personnage/`, { headers: this.httpOptions.headers, params: myParams });
+    return this.http.get(`${this.baseUrl}personnage/`, { headers: this.httpOptions.headers, params: myParams });
   }
 /*
   public  getPersoFromAllJouer(team): Observable<any> {
@@ -58,6 +58,6 @@ export class PersonnageService {
 */
   public updatePartielPesonnage(personnage: any, param: any): Observable<any> {
     const body = JSON.stringify(param);
-    return this.http.patch(`${this.baseUrl}timesapp/personnage/${personnage.id}`, body, this.httpOptions);
+    return this.http.patch(`${this.baseUrl}personnage/${personnage.id}`, body, this.httpOptions);
   }
 }

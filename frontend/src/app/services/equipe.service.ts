@@ -23,16 +23,16 @@ export class EquipeService {
 
   public createEquipe(equipe: any): Observable<any> {
     this.equipeCreated = true;
-    return this.http.post(`${this.baseUrl}timesapp/equipe/create`, JSON.stringify({equipe} ), this.httpOptions);
+    return this.http.post(`${this.baseUrl}equipe/create`, JSON.stringify({equipe} ), this.httpOptions);
   }
 
 
   public updatePartielEquipe(equipe: any, param: any): Observable<any> {
     let body = JSON.stringify(param);
-    return this.http.patch(`${this.baseUrl}timesapp/equipe/update/${equipe.id}`, body, this.httpOptions);
+    return this.http.patch(`${this.baseUrl}equipe/update/${equipe.id}`, body, this.httpOptions);
   }
 
   public  getEquipe(partie: Partie) {
-    return this.http.get(`${this.baseUrl}timesapp/equipe/frompartie/${partie.id}`, this.httpOptions);
+    return this.http.get(`${this.baseUrl}equipe/frompartie/${partie.id}`, this.httpOptions);
   }
 }

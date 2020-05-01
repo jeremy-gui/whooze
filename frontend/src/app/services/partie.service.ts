@@ -15,7 +15,7 @@ export class PartieService {
   // http options used for making API calls
   private httpOptions: any;
 
-  baseUrl: string = environment.apiUrl;
+  tokUrl: string = environment.tokUrl;
   public partie: Partie;
   public  partieCreated = false;
   connection$: WebSocketSubject<any>;
@@ -29,10 +29,10 @@ export class PartieService {
 
 
   connect(codepartie: any, token: any): Observable<any> {
-    return of(this.baseUrl).pipe(
-      filter(apiUrl => !!apiUrl),
+    return of(this.tokUrl).pipe(
+      filter(tokUrl => !!tokUrl),
       // https becomes wws, http becomes ws
-      map(apiUrl => apiUrl.replace(/^http/, 'ws') + 'ws/timesapp/chat/'+codepartie+'/'+token+'/'),
+      map(tokUrl => tokUrl.replace(/^http/, 'ws') + 'ws/timesapp/chat/'+codepartie+'/'+token+'/'),
       switchMap(wsUrl => {
         if (this.connection$) {
           return this.connection$;
@@ -76,14 +76,14 @@ export class PartieService {
 
 
   public createPartie(partie: any): Observable<any> {
-       return this.http.post(`${this.baseUrl}timesapp/partie/create`, JSON.stringify({partie} ), this.httpOptions);
+       return this.http.post(`${this.baseUrl}partie/create`, JSON.stringify({partie} ), this.httpOptions);
   }
 
   public getPartieFromGameCode(code: any): Observable<any> {
-    return this.http.get(`${this.baseUrl}timesapp/partie/fromgamecode/${code}`, this.httpOptions);
+    return this.http.get(`${this.baseUrl}partie/fromgamecode/${code}`, this.httpOptions);
   }
 
   public getPartieFromId(id: any): Observable<any> {
-    return this.http.get(`${this.baseUrl}timesapp/api/parties/${id}`, this.httpOptions);
+    return this.http.get(`${this.baseUrl}api/parties/${id}`, this.httpOptions);
   }
 }

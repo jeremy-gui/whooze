@@ -21,12 +21,12 @@ export class JoueurService {
   }
 
     public createJoueur(joueur: any): Observable<any> {
-       return this.http.post(`${this.baseUrl}timesapp/joueur/create`, JSON.stringify({joueur} ), this.httpOptions);
+       return this.http.post(`${this.baseUrl}joueur/create`, JSON.stringify({joueur} ), this.httpOptions);
     }
 
 
   public updatePartielJoueur(joueur: any, param: any): Observable<any> {
     const body = JSON.stringify(param);
-    return this.http.patch(`${this.baseUrl}timesapp/joueur/update/${joueur.id}`, body, this.httpOptions);
+    return this.http.patch(`${this.baseUrl}joueur/update/${joueur.id}`, body, this.httpOptions);
   }
 }
