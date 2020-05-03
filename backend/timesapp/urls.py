@@ -32,7 +32,7 @@ urlpatterns = [
     path(r'personnage/', timesapp.PersonnageList.as_view()),
     path(r'personnage/<int:pk>', timesapp.PersonnageDetail.as_view()),
     path(r'chat/<str:room_name>/', timesapp.room, name='room'),
-    path(r'', views.index, name='index')
+    path(r'', views.index, name='index')x
 ]
 urlpatterns += [
     path(r'api-auth/', include('rest_framework.urls')),
