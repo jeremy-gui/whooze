@@ -2,19 +2,14 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {User} from '../models/user';
 import {Subject, Subscription} from 'rxjs';
 import {Joueur} from '../models/joueur';
-import {Partie, StadePartieEnCours} from '../models/partie';
+import {Partie} from '../models/partie';
 import {Equipe} from '../models/equipe';
 import {Personnage} from '../models/personnage';
 import {GlobalService} from '../services/global.service';
-import {PersonnageService} from '../services/personnage.service';
 import {UserService} from '../services/user.service';
-import {JoueurService} from '../services/joueur.service';
 import {PartieService} from '../services/partie.service';
-import {EquipeService} from '../services/equipe.service';
-import {Router} from '@angular/router';
 import {takeUntil} from 'rxjs/operators';
 import {MancheService} from '../services/manche.service';
-import {toNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 
 @Component({
   selector: 'app-manche',
@@ -27,7 +22,7 @@ export class MancheComponent implements OnInit, OnDestroy {
   myteam: number;
   aQuiDeJouer: Joueur = new Joueur();
   aQuiDeJouerSub: Subscription;
-  mancheEnCours: number = 1; //de 1 à 3
+  mancheEnCours: number = 1;
   mancheEnCoursSub: Subscription;
   indexJoueurEquipe1: number = 0;
   indexJoueurEquipe1Sub: Subscription;

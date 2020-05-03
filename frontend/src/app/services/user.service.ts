@@ -28,6 +28,7 @@ export class UserService {
 
   baseUrl: string = environment.apiUrl;
   tokUrl: string = environment.tokUrl;
+  authUrl: string = environment.authUrl;
   httpHeaders = new HttpHeaders({'Content-Type': 'application/json; charset=utf-8'});
 
   constructor(private http: HttpClient) {
@@ -40,7 +41,7 @@ export class UserService {
   public login(user) {
 
 
-    this.http.post(`${this.tokUrl}api-token-auth/`, JSON.stringify(user), this.httpOptions).subscribe(
+    this.http.post(`${this.authUrl}api-token-auth/`, JSON.stringify(user), this.httpOptions).subscribe(
       data => {
         // console.log(data);
         this.updateData(data['token']);
@@ -54,7 +55,7 @@ export class UserService {
   }
   // Refreshes the JWT token, to extend the time the user is logged in
   public refreshToken() {
-    this.http.post(`${this.tokUrl}api-token-refresh/`, JSON.stringify({token: this.token}), this.httpOptions).subscribe(
+    this.http.post(`${this.authUrl}api-token-refresh/`, JSON.stringify({token: this.token}), this.httpOptions).subscribe(
       data => {
         // console.log(data);
         this.updateData(data['token']);
@@ -68,7 +69,7 @@ export class UserService {
   }
 
    verifyToken(token: any): any {
-    this.http.post(`${this.tokUrl}api-token-verify/`, JSON.stringify({'token': token}), this.httpOptions).subscribe(
+    this.http.post(`${this.authUrl}api-token-verify/`, JSON.stringify({'token': token}), this.httpOptions).subscribe(
       data => {
         // console.log(data);
         this.updateData(data['token']);
@@ -115,7 +116,7 @@ export class UserService {
   }
 
   loginUser(userData: any): Observable<any> {
-    const url = `${this.tokUrl}api-token-auth/`;
+    const url = `${this.authUrl}api-token-auth/`;
     return this.http.post(url, userData, {headers: this.httpHeaders});
   }
 

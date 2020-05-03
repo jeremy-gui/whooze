@@ -7,6 +7,7 @@ import {CreateorjoinpartieComponent} from './createorjoinpartie/createorjoinpart
 import {EntercodeComponent} from './entercode/entercode.component';
 import {CreatepersoComponent} from './createperso/createperso.component';
 import {TheendComponent} from './theend/theend.component';
+import {MancheComponent} from './manche/manche.component';
 
 const APP_ROUTES: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,6 +18,7 @@ const APP_ROUTES: Routes = [
   { path: 'joingame', component: CreateorjoinpartieComponent },
   { path: 'entergamecode', component: EntercodeComponent },
   { path: 'createperso', component: CreatepersoComponent},
+  { path: 'manche', component: MancheComponent},
   { path: 'theend', component: TheendComponent},
   { path: '', component: HomeComponent }
 ];

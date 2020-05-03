@@ -14,17 +14,12 @@ import { SignupComponent} from './signup/signup.component';
 import { MainModule } from './main/main.module';
 
 import { APP_ROUTING } from './app.routes';
-import { ChooseusernameComponent } from './chooseusername/chooseusername.component';
-import { CreateorjoinpartieComponent } from './createorjoinpartie/createorjoinpartie.component';
 import {TokenInterceptor} from './services/token-interceptor';
 import {PartieService} from './services/partie.service';
 import {EquipeService} from './services/equipe.service';
 import { EntercodeComponent } from './entercode/entercode.component';
-import { CreatepersoComponent } from './createperso/createperso.component';
 import {PersonnageService} from './services/personnage.service';
-import { MancheComponent } from './manche/manche.component';
 import {MancheService} from './services/manche.service';
-import { TheendComponent } from './theend/theend.component';
 
 @NgModule({
   declarations: [

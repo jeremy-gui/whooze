@@ -3,24 +3,25 @@
 @import "../node_modules/bootstrap/scss/variables";
 @import "../node_modules/bootstrap/scss/mixins";
 @import "../node_modules/bootstrap/scss/bootstrap";
-
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Chelsea+Market&display=swap');
 
 $enable-responsive-font-sizes: true;
 
-@font-face {
-  font-family: $font-family-brand;
-  src: url($badabb-text-regular-font-path-woff2) format('woff2'),
-  url($badabb-text-regular-font-path-woff) format('woff');
-  font-weight: normal;
-  font-style: normal;
+body {
+  font-family: 'Anton', sans-serif;
 }
 
-body {
-  font-family: $font-family-brand;
+.titrename {
+  font-family: 'Chelsea Market', cursive;
 }
 
 h1 {
+  font-family: 'Chelsea Market', cursive;
   @include responsive-font-size(8vw);
+}
+
+h2 {
+  font-family: 'Chelsea Market', cursive;
 }
 
 .title-custom {
