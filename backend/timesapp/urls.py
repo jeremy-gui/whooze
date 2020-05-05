@@ -17,7 +17,7 @@ router.register(r'partiecourante', views.Parties)
 
 urlpatterns = [
     path(r'api/', include(router.urls)),
-    path(r'current_user/', timesapp.get_current_user),
+    path(r'user/get/<int:iduser>', timesapp.GetUserFromId.as_view()),
     path(r'users/create', timesapp.CreateUserView.as_view()),
     path(r'joueur/create', timesapp.CreateJoueurView.as_view()),
     path(r'joueur/update/<int:pk>', timesapp.UpdateJoueurView.as_view()),
@@ -32,7 +32,7 @@ urlpatterns = [
     path(r'personnage/', timesapp.PersonnageList.as_view()),
     path(r'personnage/<int:pk>', timesapp.PersonnageDetail.as_view()),
     path(r'chat/<str:room_name>/', timesapp.room, name='room'),
-    path(r'', views.index, name='index')x
+    path(r'', views.index, name='index')
 ]
 urlpatterns += [
     path(r'api-auth/', include('rest_framework.urls')),

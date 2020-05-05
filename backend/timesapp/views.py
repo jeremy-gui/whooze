@@ -18,7 +18,7 @@ from rest_framework import generics
 from django.shortcuts import render
 
 from .models import Partie, Joueur, Equipe, Personnage, User
-from .serializers import partieSerializer, joueurSerializer, userSerializer, UserSerializerWithToken, equipeSerializer, \
+from .serializers import partieSerializer, joueurSerializer, UserSerializer, UserSerializerWithToken, equipeSerializer, \
     personnageSerializer
 
 
@@ -91,16 +91,16 @@ class EquipeDetail(ModelViewSet):
 
 class UserList(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = userSerializer
+    serializer_class = UserSerializer
 
 
 class UserDetail(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = userSerializer
+    serializer_class = UserSerializer
 
 @api_view(['GET'])
 def get_current_user(request):
-    serializer = userSerializer(request.user)
+    serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
 class CreateUserView(APIView):
@@ -208,14 +208,24 @@ class UpdateEquipeView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = joueurSerializer
 
 class GetEquipeFromPartie(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = equipeSerializer
 
     def get_queryset(self):
         idpartie = self.kwargs['idpartie']
         return Equipe.objects.filter(partie_id=idpartie)
 
+class GetUserFromId(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        iduser = self.kwargs['iduser']
+        return User.objects.filter(pk=iduser)
+
 
 class GetPartieFromGameCode(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = partieSerializer
 
     def get_queryset(self):
@@ -223,6 +233,7 @@ class GetPartieFromGameCode(generics.ListAPIView):
         return Partie.objects.filter(code_unique=code)
 
 class GetPartieFromId(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = partieSerializer
 
     def get_queryset(self):
@@ -230,6 +241,7 @@ class GetPartieFromId(generics.ListAPIView):
         return Partie.objects.filter(id=idpartie)
 
 class GetJoueurFromId(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = joueurSerializer
 
     def get_queryset(self):
@@ -237,6 +249,7 @@ class GetJoueurFromId(generics.ListAPIView):
         return Joueur.objects.filter(id=idjoueur)
 
 class GetAllPlayerOfOneEquipe(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = joueurSerializer
 
     def get_queryset(self):

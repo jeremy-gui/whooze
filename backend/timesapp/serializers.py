@@ -1,5 +1,5 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework_jwt.settings import api_settings
 
 from .models import Partie, Joueur, User, Equipe, Personnage
 
@@ -46,15 +46,37 @@ class personnageSerializer(serializers.ModelSerializer):
         model = Personnage
         fields = '__all__'
 
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        return data
+
+    def create(self, validated_data):
+        data = {
+            key: value for key, value in validated_data.items()
+            if key not in ('password')
+        }
+        data['password'] = validated_data['password']
+        return self.Meta.model.objects.create_user(**data)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'id', 'email', 'password', 'parties', 'joueurs'
+        )
+        read_only_fields = ('id',)
+
 class UserSerializerWithToken(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     token = serializers.SerializerMethodField()
-
-    def get_token(self, object):
-        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        payload = jwt_payload_handler(object)
-        token = jwt_encode_handler(payload)
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        user_data = UserSerializer(user).data
+        for key, value in user_data.items():
+            if key != 'id':
+                token[key] = value
         return token
 
     def create(self, validated_data):
@@ -67,4 +89,4 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('token', 'email', 'password')
+        fields = ('token', 'email', 'password', 'parties', 'joueurs')

@@ -1,13 +1,13 @@
 import json
 from random import shuffle
-
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from channels.auth import login
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from djangochannelsrestframework.consumers import AsyncAPIConsumer
 from django.core import serializers
-from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
+
 
 from timesapp.models import Partie, Joueur, Equipe, User, Personnage
 from timesapp.serializers import userSerializer, joueurSerializer, partieSerializer
@@ -21,31 +21,20 @@ class PartieConsumer(AsyncAPIConsumer):
     prochainJoueur = ""
 
     async def connect(self):
-
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.token = self.scope['url_route']['kwargs']['token']
         self.room_group_name = 'chat_%s' % self.room_name
-        user = {}
-        user['user'] = {}
-        user['user']['token'] = self.token
-        try:
-            user = await self.verifyToken(user['user'])
-            await login(self.scope, user['user'])
-            await database_sync_to_async(self.scope["session"].save)()
-            if(user['user'].is_authenticated):
-                self.scope['user'] = user['user']
+        user = self.scope['user']
 
-                # Join room group
-                await self.channel_layer.group_add(
-                    self.room_group_name,
-                    self.channel_name,
-                )
-                await self.accept()
-        except Exception as inst:
-            event = {}
-            event['message'] = inst
-            self.chat_message(event)
-            await self.disconnect(event['code'])
+        if(user.is_anonymous):
+            # Join room group
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name,
+            )
+            await self.accept()
+        else:
+            await self.disconnect("not connected")
+            await self.close()
 
     async def disconnect(self, close_code):
         partie = await self.getPartie()
