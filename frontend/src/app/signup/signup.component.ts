@@ -65,11 +65,16 @@ export class SignupComponent implements OnInit {
       this.user = new User(this.registerForm.value);
       this._userService.createUserThenConnect(this.user).subscribe (
         data => {
-          this.user = data.user;
-          localStorage.setItem('token', data.token);
-          this.global.me = data.user;
+          localStorage.setItem('access_token', data.access);
+          localStorage.setItem('refresh_token', data.refresh);
+          this._userService.updateData(data.access, data.refresh);
+          const user = new User();
+          user.id  = this._userService.user.id;
+          user.email = this.user.email;
+          this.user = user;
+          this.global.me = this.user;
           this._userService.connected = true;
-          this.router.navigate(['/'],{ state: {data: {"registerOk" : true}}});
+          this.router.navigate(['/'], { state: {data: {"registerOk" : true}}});
          },
         error => {
           console.log(error);

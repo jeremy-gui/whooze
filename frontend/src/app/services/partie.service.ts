@@ -33,7 +33,7 @@ export class PartieService {
     return of(this.authUrl).pipe(
       filter(authUrl => !!authUrl),
       // https becomes wws, http becomes ws
-      map(authUrl => authUrl.replace(/^http/, 'ws') + 'ws/timesapp/chat/'+codepartie+'/'+token+'/'),
+      map(authUrl => authUrl.replace(/^http/, 'ws') + 'ws/timesapp/chat/'+codepartie+'/?token='+token+'/'),
       switchMap(wsUrl => {
         if (this.connection$) {
           return this.connection$;

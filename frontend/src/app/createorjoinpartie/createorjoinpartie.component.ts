@@ -244,8 +244,8 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   }
 
   connect(code) {
-    this.account.token = this._userService.token;
-    this._partieService.connect(code, this.account.token).pipe(
+    this.account.access_token = this._userService.access_token;
+    this._partieService.connect(code, this.account.access_token).pipe(
       takeUntil(this.destroyed$)
     ).subscribe(messages => {
       if (messages.message.requete === 'get_team1') {
@@ -304,7 +304,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
     this._partieService.send("" , "get_team2");
   }
   sendMessage() {
-    this.account.token = this._userService.token;
+    this.account.refresh_token = this._userService.refresh_token;
     this._partieService.send(this.msgCtrl.value , "message");
     this.msgCtrl.setValue('');
   }

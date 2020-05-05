@@ -75,7 +75,7 @@ export class MancheComponent implements OnInit, OnDestroy {
   constructor(private global: GlobalService, public manche: MancheService, public _userService: UserService, public _partieService: PartieService) {}
 
     ngOnInit(): void {
-      if (localStorage.getItem('token') || localStorage.getItem('account')) {
+      if (localStorage.getItem('access_token') || localStorage.getItem('account')) {
         this.subscribeGameAndConnectToWS();
       }
     }
@@ -358,8 +358,8 @@ export class MancheComponent implements OnInit, OnDestroy {
     }
   }
   connect(code) {
-    this.account.token = this._userService.token;
-    this._partieService.connect(code, this.account.token).pipe(
+    this.account.access_token = this._userService.access_token;
+    this._partieService.connect(code, this.account.access_token).pipe(
       takeUntil(this.destroyed$)
     ).subscribe(messages => {
       if (messages.message.requete === 'get_team1') {

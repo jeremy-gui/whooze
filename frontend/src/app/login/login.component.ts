@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {throwError} from 'rxjs';
+import {Subscription, throwError} from 'rxjs';
 import {GlobalService, UserService} from '../services/services.index';
 import {environment} from '../../environments/environment';
+import {User} from '../models/user';
 
 @Component({
   selector: 'app-login',
@@ -15,8 +16,9 @@ export class LoginComponent implements OnInit {
   loading: boolean;
   sepcerror: string;
   title: string;
+  user: User;
+  userSub: Subscription;
 
-  public user: any;
 
   constructor( private fb: FormBuilder,
                public _userService: UserService,
@@ -27,7 +29,6 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     if (localStorage.getItem('cantcomeback') === 'true') {
       if (localStorage.getItem('manchestarted')) {
-        console.log("test");
         localStorage.setItem('cantcomeback', 'false');
         this.router.navigate(['manche']);
       }
@@ -38,26 +39,33 @@ export class LoginComponent implements OnInit {
       email: ['', Validators.required],
       password: ['', Validators.required]
     });
-    if (localStorage.getItem('token') && localStorage.getItem('account')) {
+    if (localStorage.getItem('access_token') && localStorage.getItem('account')) {
+      this.global.me = JSON.parse(localStorage.getItem('account'));
+      this.userSub = this.global.user.subscribe(
+        me => this.user = me
+      );
       this.global.me = JSON.parse(localStorage.getItem('account'));
       this._userService.connected = true;
-      console.log('if');
       this.router.navigate(['/']);
     }
   }
   login() {
     this.loading = true;
-    this._userService.loginUser(this.loginForm.value).subscribe (
+    this._userService.loginAndGetUser(this.loginForm.value).subscribe (
       response => {
+        console.log(response[0]);
         this.loading = false;
-        localStorage.setItem('token', response.token);
         this._userService.connected = true;
-        this.global.me = response.user;
+        this.user = new User();
+        this.user.id = response[0].id;
+        this.user.email = response[0].email;
+        this.global.me = this.user;
         this.router.navigate(['/']);
       },
       error => {
+        console.log(error);
         this.loading = false;
-        this.loginForm.setErrors({ NoEmailorPasswordmatch: true })
+        this.loginForm.setErrors({ NoEmailorPasswordmatch: true });
         this._userService.connected = false;
         this.sepcerror = 'Wrong email and/or password';
       }
@@ -65,7 +73,7 @@ export class LoginComponent implements OnInit {
   }
 
   refreshToken() {
-    this._userService.refreshToken();
+    //this._userService.refreshToken();
   }
 
   logout() {

@@ -20,6 +20,7 @@ import {EquipeService} from './services/equipe.service';
 import { EntercodeComponent } from './entercode/entercode.component';
 import {PersonnageService} from './services/personnage.service';
 import {MancheService} from './services/manche.service';
+import {JwtInterceptor} from './jwt.interceptor';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,7 @@ import {MancheService} from './services/manche.service';
     MainModule
   ],
   providers: [UserService, GlobalService, JoueurService, PartieService, EquipeService, PersonnageService, MancheService,
-      { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
+      { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })
 

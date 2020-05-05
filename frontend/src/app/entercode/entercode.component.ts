@@ -28,7 +28,7 @@ export class EntercodeComponent implements OnInit {
 
 
   ngOnInit(): void {
-      if (localStorage.getItem('token') || localStorage.getItem('account')) {
+      if (localStorage.getItem('access_token') || localStorage.getItem('account')) {
         this.userSub = this.global.user.subscribe(
           me => this.account = me
         );

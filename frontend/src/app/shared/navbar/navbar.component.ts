@@ -57,8 +57,7 @@ export class NavbarComponent implements OnInit {
     if (history.state.data && history.state.data.registerOk)    {
       this.message = 'Thank you for suscribing ! Now let\'s play tooooo ';
       history.state.data.registerOk = false;
-    }
-    else {
+    } else {
       this.message = "";
     }
     this.router.events.subscribe((val) => {
@@ -67,35 +66,19 @@ export class NavbarComponent implements OnInit {
         this.message = "";
       }
     });
-    if (!localStorage.getItem('token') || !localStorage.getItem('account')) {
+    if (!localStorage.getItem('refresh_token') || !localStorage.getItem('account')) {
       this._userService.connected = false;
       this.router.navigate(['/']); this.message = "";
-      } else if (localStorage.getItem('token') || localStorage.getItem('account')) {
+      } else if (localStorage.getItem('refresh_token') || localStorage.getItem('account')) {
 
-      // on verifie d'abord que le token n'est pas sur le point d'expirer (dans les 3 jours)
-      this._userService.updateData(localStorage.getItem('token'));
 
-      const date1: number = Date.now();
-      const diffDate: number = this._userService.token_expires - date1;
-
-      if (diffDate <= 259200000) {
-        if (this._userService.verifyToken(localStorage.getItem('token'))) {
-          this._userService.connected = true;
-          this.global.me = JSON.parse(localStorage.getItem('account'));
-          this.userSub = this.global.user.subscribe(
-            me => this.account = me
-          );
-        } else {
-          this.logout();
-        }
-      } else if (diffDate > 259200000) {
         this._userService.connected = true;
         this.global.me = JSON.parse(localStorage.getItem('account'));
         this.userSub = this.global.user.subscribe(
           me => this.account = me
         );
       }
-    }
+
     if (!localStorage.getItem('joueur')) {
         this._joueurService.joueurCreated = false;
         this.router.navigate(['/']);

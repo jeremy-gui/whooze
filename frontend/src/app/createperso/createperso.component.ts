@@ -62,7 +62,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
   constructor(private formBuilder: FormBuilder, private global: GlobalService, public _personnageService: PersonnageService, public _userService: UserService, public _joueurService: JoueurService, public _partieService: PartieService, public _equipeService: EquipeService, private router: Router) { }
 
   ngOnInit(): void {
-    if (localStorage.getItem('token') || localStorage.getItem('account')) {
+    if (localStorage.getItem('access_token') || localStorage.getItem('account')) {
       this.registerForm = this.formBuilder.group({
         nom: [null, Validators.compose([
           Validators.required,
@@ -145,8 +145,8 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
   }
 
   connect(code) {
-    this.account.token = this._userService.token;
-    this._partieService.connect(code, this.account.token).pipe(
+    this.account.access_token = this._userService.access_token;
+    this._partieService.connect(code, this.account.access_token).pipe(
       takeUntil(this.destroyed$)
     ).subscribe(messages => {
       if (messages.message.requete === 'get_team1') {

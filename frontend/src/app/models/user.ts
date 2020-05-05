@@ -4,7 +4,8 @@ public constructor(init?: Partial<User>) {
 }
   id: number;
   email: string;
-  token: string;
+  refresh_token: string;
+  access_token: string;
   password: string;
 }
 

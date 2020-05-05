@@ -32,7 +32,7 @@ export class ChooseusernameComponent implements OnInit {
     if (history.state.data && history.state.data.joingame) {
       this.nextPage = "joingame";
     }
-    if (localStorage.getItem('token') || localStorage.getItem('account')) {
+    if (localStorage.getItem('access_token') || localStorage.getItem('account')) {
 
       this.account = JSON.parse(localStorage.getItem('account'));
       this.userSub = this.global.user.subscribe(
