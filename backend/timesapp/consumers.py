@@ -1,6 +1,7 @@
 import json
 from random import shuffle
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.authentication import JWTAuthentication, JWTTokenUserAuthentication
 from channels.auth import login
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
@@ -21,20 +22,29 @@ class PartieConsumer(AsyncAPIConsumer):
     prochainJoueur = ""
 
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'chat_%s' % self.room_name
-        user = self.scope['user']
 
-        if(user.is_anonymous):
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.token = self.scope['url_route']['kwargs']['token']
+        self.room_group_name = 'chat_%s' % self.room_name
+        user = {}
+        user['user'] = {}
+        user['user']['token'] = self.token
+
+
+        user = await self.verifyToken(user['user'])
+
+        await login(self.scope, user)
+        await database_sync_to_async(self.scope["session"].save)()
+        if(user.is_authenticated):
+            self.scope['user'] = user
+
             # Join room group
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name,
             )
             await self.accept()
-        else:
-            await self.disconnect("not connected")
-            await self.close()
+
 
     async def disconnect(self, close_code):
         partie = await self.getPartie()
@@ -98,9 +108,11 @@ class PartieConsumer(AsyncAPIConsumer):
     @database_sync_to_async
     def verifyToken(self, user):
         data = {'token': user['token']}
-        valid_data = VerifyJSONWebTokenSerializer().validate(data)
+        auth = JWTAuthentication()
+        valid = auth.get_validated_token(user['token'])
+        user = auth.get_user(valid)
 
-        return valid_data
+        return user
 
     @database_sync_to_async
     def majScoreT1(self, idPartie, data):
@@ -184,10 +196,10 @@ class PartieConsumer(AsyncAPIConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        print(text_data_json['requete'])
+
         message = text_data_json['message']
         requete = text_data_json['requete']
-        print(text_data_json['message'])
+
         user = self.scope['user']
 
         # Send message to room group
@@ -320,7 +332,7 @@ class PartieConsumer(AsyncAPIConsumer):
                         z += 1
                         x -= 1
 
-                    print(jteamcomplete)
+
 
 
                 data = {}
