@@ -245,6 +245,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
 
   connect(code) {
     this.account.access_token = this._userService.access_token;
+    console.log(this.account.access_token);
     this._partieService.connect(code, this.account.access_token).pipe(
       takeUntil(this.destroyed$)
     ).subscribe(messages => {

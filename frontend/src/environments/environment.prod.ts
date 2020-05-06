@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://api.example.com:9000/timesapp/',
-  tokUrl: 'http://api.example.com:9000/timesapp/',
-  authUrl: 'http://api.example.com:9000/',
+  apiUrl: 'http://api.example.com/timesapp/',
+  tokUrl: 'http://api.example.com/timesapp/',
+  authUrl: 'http://api.example.com/',
   title: 'Whooze',
   debug: true
 };

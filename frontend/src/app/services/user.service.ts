@@ -56,7 +56,7 @@ export class UserService {
   }
   // Refreshes the JWT token, to extend the time the user is logged in
   public refreshToken(tok: any): Observable<HttpEvent<any>> {
-    return this.http.post(`${this.authUrl}api-token-refresh/`, JSON.stringify({refresh: tok}), this.httpOptions);
+    return this.http.post<HttpEvent<any>>(`${this.authUrl}api-token-refresh/`,JSON.stringify({refresh: tok}),  this.httpOptions);
   }
 
    verifyToken(token: any): any {
