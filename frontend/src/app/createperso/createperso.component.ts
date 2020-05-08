@@ -176,7 +176,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
           this.personnagesComplete.push(p);
         });
         this.global.melistepersonnagescomplete = this.personnagesComplete;
-        this._partieService.send('', 'letsstartround1');
+        this._partieService.send('', 'letsstartround1', this._userService.access_token);
       }
       if (messages.message.requete === 'letsstartround1') {
         const round1 = StadePartieEnCours.ROUND_1;
@@ -209,7 +209,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     }
   }
   startthegame() {
-    this._partieService.send('', "listepersocomplete");
+    this._partieService.send('', "listepersocomplete", this._userService.access_token);
   }
 
   majTeam1(data: any) {
@@ -247,10 +247,10 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     this.global.joueurs_team2 = this.joueursTeam2;
   }
   getTeam1() {
-    this._partieService.send("" , "get_team1");
+    this._partieService.send("" , "get_team1", this._userService.access_token);
   }
   getTeam2() {
-    this._partieService.send("" , "get_team2");
+    this._partieService.send("" , "get_team2", this._userService.access_token);
   }
   ErreurNombrePerso() {
     if (this.personnages.length >= 10) {
@@ -263,11 +263,11 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
     if (this.personnages.length === 10 && cancel === false) {
         this.joueur.readytostart = true;
         this.global.megamer = this.joueur;
-        this._partieService.send(true , "readytostart");
+        this._partieService.send(true , "readytostart", this._userService.access_token);
     } else  if (this.personnages.length === 10 && cancel === true) {
       this.joueur.readytostart = false;
       this.global.megamer = this.joueur;
-      this._partieService.send(false , "readytostart");
+      this._partieService.send(false , "readytostart", this._userService.access_token);
     } else {
       this.ErreurNombrePerso();
       this.joueur.readytostart = false;

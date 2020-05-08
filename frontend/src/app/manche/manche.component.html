@@ -1,5 +1,5 @@
 <h2 class="mb-5 title-custom">Round #{{this.mancheEnCours}}</h2> - <h2 class="mb-5 title-custom" [ngClass]="{ 'text-info' : this.equipeEnCours.nom === '1', 'text-warning' : this.equipeEnCours.nom === '2'}" >Team {{this.equipeEnCours.nom}}</h2>
-<div class="container">
+<div class="container" *ngIf="this.theend === false">
   <!-- Quand c'est le tout debut : manche 1 aucun joueur n'a joue
   -->
   <div *ngIf="!this.mancheStarted && !this.afficheScore && !this.afficheInterround" class=" justify-content-center playertostart text-center">
@@ -84,6 +84,26 @@
       </div>
     </div>
   </div>
+</div>
+<div class="container" *ngIf="this.theend === true">
+      <h2 *ngIf="this.egalite">No winners, no loosers, we have a tie!</h2>
+  <h2 *ngIf="!this.egalite">Team {{this.teamwin.nom}} win, bravo!</h2>
+      <div class="row d-flex justify-content-center">
+        <div class="col d-flex justify-content-center"><h3 class="text-info">{{this.listePersonnageGoodT1.length}}</h3></div>
+        <div class="col d-flex justify-content-center"></div>
+        <div class="col d-flex justify-content-center"><h3 class="text-warning">{{this.listePersonnageGoodT2.length}}</h3></div>
+      </div>
+      <div class="row d-flex justify-content-center" >
+        <div class="col d-flex justify-content-center" >
+          <h3 class="text-info">For team 1</h3>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col d-flex justify-content-center" >
+          <h3 class="text-warning">For team 2</h3>
+        </div>
+      </div>
 
 </div>
+
 

@@ -77,6 +77,14 @@ export class NavbarComponent implements OnInit {
         this.userSub = this.global.user.subscribe(
           me => this.account = me
         );
+        this._userService.refreshToken(localStorage.getItem('refresh_token')).subscribe(result => {
+          this._userService.updateData(result['access'], result['refresh']);
+          this._userService.connected = true;
+
+          localStorage.setItem('access_token', result['access']);
+          localStorage.setItem('refresh_token', result['refresh']);
+        });
+
       }
 
     if (!localStorage.getItem('joueur')) {

@@ -55,21 +55,31 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
 
-    if (localStorage.getItem('token') || localStorage.getItem('account')) {
+    if (localStorage.getItem('access_token') || localStorage.getItem('account')) {
 
         this.global.me = JSON.parse(localStorage.getItem('account'));
         this.userSub = this.global.user.subscribe(
           me => this.account = me
         );
+        this._userService.refreshToken(localStorage.getItem('refresh_token')).subscribe(result => {
+          this._userService.updateData(result['access'], result['refresh']);
+          this._userService.connected = true;
+
+          localStorage.setItem('access_token', result['access']);
+          localStorage.setItem('refresh_token', result['refresh']);
+          if (localStorage.getItem('partie')) {
+            this.subscribeGame();
+          }
+        });
+
+
         if (localStorage.getItem('joueur')) {
           this.global.megamer = JSON.parse(localStorage.getItem('joueur'));
           this.joueurSub = this.global.joueur.subscribe(
             megamer => this.joueur = megamer
           );
         }
-        if (localStorage.getItem('partie')) {
-          this.subscribeGame();
-        }
+
 
         // si le joueur est le createur de la partie
         if (history.state.data && history.state.data.creator) {
@@ -245,7 +255,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
 
   connect(code) {
     this.account.access_token = this._userService.access_token;
-    console.log(this.account.access_token);
+
     this._partieService.connect(code, this.account.access_token).pipe(
       takeUntil(this.destroyed$)
     ).subscribe(messages => {
@@ -259,8 +269,8 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
            });
          }
           const result = JSON.parse(messages.message.equipe);
-          this.global.joueurs_team1 = [];
-          result.forEach(element => {
+            this.global.joueurs_team1 = [];
+            result.forEach(element => {
             let j: Joueur = new Joueur();
             j.id = element.pk;
             j.equipe_id = element.fields.equipe_id;
@@ -299,28 +309,29 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
     });
   }
   getTeam1() {
-    this._partieService.send("" , "get_team1");
+    this._partieService.send("" , "get_team1", this._userService.access_token);
   }
   getTeam2() {
-    this._partieService.send("" , "get_team2");
+    this._partieService.send("" , "get_team2", this._userService.access_token);
   }
   sendMessage() {
     this.account.refresh_token = this._userService.refresh_token;
-    this._partieService.send(this.msgCtrl.value , "message");
+    this.account.access_token = this._userService.access_token;
+    this._partieService.send(this.msgCtrl.value , "message", this._userService.access_token);
     this.msgCtrl.setValue('');
   }
 
   StartGame() {
     let error = false;
     if ((this.joueursTeam1.length + this.joueursTeam2.length) < 4) {
-        this.messageErreur = 'The number of players must be at least 4';
+        this.messageErreur = 'The number of players must be 4 at least';
         error = true;
     } else if (this.joueursTeam1.length < 2 || this.joueursTeam2.length < 2) {
-        this.messageErreur = 'The number of players per team must be at least 2';
+        this.messageErreur = 'The number of players per team must be 2 at least';
         error = true;
     }
     if (!error) {
-      this._partieService.send('', 'letscreateperso');
+      this._partieService.send('', 'letscreateperso', this._userService.access_token);
     }
   }
 }
