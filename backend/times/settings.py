@@ -59,8 +59,13 @@ MIDDLEWARE = [
 ]
 CORS_ORIGIN_WHITELIST = [
     "https://www.example.com",
+    "http://www.example.com",
     "https://example.com",
+    "http://example.com",
     "https://api.example.com",
+    "http://api.example.com",
+    "ws://api.example.com",
+    "wss://api.example.com",
     "https://localhost:8000",
     "https://localhost:9000",
     "http://localhost:8080",

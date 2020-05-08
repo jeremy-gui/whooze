@@ -199,8 +199,10 @@ class PartieConsumer(AsyncAPIConsumer):
 
         message = text_data_json['message']
         requete = text_data_json['requete']
-
-        user = self.scope['user']
+        token = {}
+        token['token'] = text_data_json['token']
+        user = await self.verifyToken(token)
+        self.scope['user'] = user
 
         # Send message to room group
 
@@ -517,7 +519,7 @@ class PartieConsumer(AsyncAPIConsumer):
             test envoi message chat avec controle token
             """
             user = await self.verifyToken(text_data_json['user'])
-            self.scope['user'] = user['user']
+            self.scope['user'] = user
 
             await self.channel_layer.group_send(
                 self.room_group_name,

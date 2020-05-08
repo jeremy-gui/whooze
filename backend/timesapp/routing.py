@@ -1,9 +1,10 @@
+from django.conf.urls import url
 from django.urls import re_path, path
 
 from . import consumers
 
 websocket_urlpatterns = [
-    path(r'ws/timesapp/chat/<str:room_name>/<str:token>/', consumers.PartieConsumer),
+    url('^ws/timesapp/chat/(?P<room_name>[^/]+)/(?P<token>[^/]+)/$', consumers.PartieConsumer),
 ]
 """
 channel_routing = {
