@@ -24,8 +24,6 @@ export class MancheComponent implements OnInit, OnDestroy {
   aQuiDeJouerSub: Subscription;
   mancheEnCours: number = 1;
   mancheEnCoursSub: Subscription;
-  indexJoueurEquipe1: number = 0;
-  indexJoueurEquipe1Sub: Subscription;
   mancheStarted: boolean = false;
   mancheStartedSub: Subscription;
   afficheScore: boolean = false;
@@ -141,6 +139,7 @@ export class MancheComponent implements OnInit, OnDestroy {
         if (localStorage.getItem('equipecourante')) {
           this.manche.equipeCourante = JSON.parse(localStorage.getItem('equipecourante'));
         }
+        console.log(this.equipeEnCours);
 
         this.mancheEnCoursSub = this.manche.mancheEnCours.subscribe(
           manche => this.mancheEnCours = manche
@@ -210,15 +209,6 @@ export class MancheComponent implements OnInit, OnDestroy {
         if (localStorage.getItem('persotoguess')) {
           this.manche.persoToGuess = JSON.parse(localStorage.getItem('persotoguess'));
         }
-        this.indexJoueurEquipe1Sub = this.manche.indexJoueurEquipe1.subscribe(
-          index => this.indexJoueurEquipe1 = index
-        );
-        if (localStorage.getItem('indexjoueurequipe1')) {
-          this.manche.indexjequipe1 = Number(localStorage.getItem('indexjoueurequipe1'));
-        }
-        if (!localStorage.getItem('indexjoueurequipe1')) {
-          this.manche.indexjequipe1 = 0;
-        }
 
         this.joueursTeamCompleteSub = this.manche.joueursTeamComplete.subscribe(
           joueurs_team1Temp => this.joueursTeamComplete = joueurs_team1Temp
@@ -240,6 +230,7 @@ export class MancheComponent implements OnInit, OnDestroy {
         }
         if (localStorage.getItem('timer')) {
           this.manche.timerseconde = Number(localStorage.getItem('timer'));
+          //this.startTimer();
         }
         this.timeLeftSub = this.manche.timer.subscribe(
           time => this.timeLeft = time
@@ -248,8 +239,8 @@ export class MancheComponent implements OnInit, OnDestroy {
           this.manche.timerseconde = 0;
         }
         this.connect(this.partie.code_unique);
-        this.getTeam1();
-        this.getTeam2();
+        //this.getTeam1();
+        //this.getTeam2();
         this.getNextPlayer();
       }
     });
@@ -273,14 +264,20 @@ export class MancheComponent implements OnInit, OnDestroy {
           if (this.listePersonnageToGuess.length > 0 && this.aQuiDeJouer.owner_id === this.account.id) {
 
             const data = {};
+            this.manche.manchestart = false;
+            this.manche.affichageScore = true;
+            this.listePersonnageWrong.push(this.listePersonnageToGuess[0]);
+            const persoTemp = this.listePersonnageToGuess[0];
+            this.listePersonnageToGuess.splice(0, 1);
+            this.listePersonnageToGuess.push(persoTemp);
+            this.manche.persoToGuess = this.listePersonnageToGuess;
             data["listePersonnageToGuess"] = this.listePersonnageToGuess;
-            data["indexJoueurEquipe1"] = this.indexJoueurEquipe1;
             data["currentteam"] = this.equipeEnCours.nom;
             data["currentround"] = this.mancheEnCours;
             data["jteamcomplete"] = this.joueursTeamComplete;
             data["jteamtemp"] = this.joueursTeamTemp;
             data["liste_personnages"] = this.personnagesComplete;
-            this._partieService.send(data,'nextplayersameround', this._userService.access_token);
+            this._partieService.send(data, 'nextplayersameround', this._userService.access_token);
           }
         }, 3000);
       }
@@ -292,7 +289,6 @@ export class MancheComponent implements OnInit, OnDestroy {
     } else if (localStorage.getItem('aquidejouer') && this.account.id === this.partie.owner_id) {
      /* const data = {};
       data["listePersonnageToGuess"] = this.listePersonnageToGuess;
-      data["indexJoueurEquipe1"] = this.indexJoueurEquipe1;
       data["currentteam"] = this.equipeEnCours.nom;
       data["currentround"] = this.mancheEnCours;
       data["jteamcomplete"] = this.joueursTeamComplete;
@@ -302,25 +298,19 @@ export class MancheComponent implements OnInit, OnDestroy {
   }
   nextName() {
     if (this.equipeEnCours.nom === "1") {
-      this.listePersonnageGoodT1.push(this.listePersonnageToGuess[this.indexOfProchainPersonnage]);
+      this.listePersonnageGoodT1.push(this.listePersonnageToGuess[0]);
       this.manche.personnageOkT1 = this.listePersonnageGoodT1;
       this._partieService.send(this.listePersonnageGoodT1,"majScoret1", this._userService.access_token);
     }
-    if (this.equipeEnCours.nom === "2") {
-      this.listePersonnageGoodT2.push(this.listePersonnageToGuess[this.indexOfProchainPersonnage]);
+    if (this.equipeEnCours.nom === "2" ) {
+      this.listePersonnageGoodT2.push(this.listePersonnageToGuess[0]);
       this.manche.personnageOkT2 = this.listePersonnageGoodT2;
       this._partieService.send(this.listePersonnageGoodT2,"majScoret2", this._userService.access_token);
     }
-    this.listePersonnageToGuess.splice(this.indexOfProchainPersonnage, 1);
+    this.listePersonnageToGuess.splice(0, 1);
     this.manche.persoToGuess = this.listePersonnageToGuess;
-    if (this.listePersonnageToGuess.length === 0) {
-      if (this.equipeEnCours.nom === "1") {
-        this._partieService.send(this.listePersonnageGoodT1,"majScoret1", this._userService.access_token);
-      }
-      if (this.equipeEnCours.nom === "2") {
-        this._partieService.send(this.listePersonnageGoodT2,"majScoret2", this._userService.access_token);
-      }
-      if ((this.mancheEnCours +  1) === 4) {
+    if (this.listePersonnageToGuess.length === 0) { // si on arrive à la fin de la liste
+      if ((this.mancheEnCours +  1) === 4) { // si on arrive à la fin du jeu
         this.pause();
         const data = {};
         data["egalite"] = false;
@@ -334,11 +324,10 @@ export class MancheComponent implements OnInit, OnDestroy {
           data["egalite"] = true;
         }
         this._partieService.send(data, "theend", this._userService.access_token);
-      }
-      else {
+      } else { // si on passe au round suivant
         const data = {};
+        this.pause();
         data["listePersonnageToGuess"] = this.listePersonnageToGuess;
-        data["indexJoueurEquipe1"] = this.indexJoueurEquipe1;
         data["currentteam"] = this.equipeEnCours.nom;
         data["currentround"] = this.mancheEnCours;
         data["jteamcomplete"] = this.joueursTeamComplete;
@@ -347,18 +336,15 @@ export class MancheComponent implements OnInit, OnDestroy {
         this._partieService.send(data,'nextround', this._userService.access_token);
       }
 
-    } else if (this.listePersonnageToGuess.length === (this.indexOfProchainPersonnage + 1)) {
-      this.indexOfProchainPersonnage = 0;
     }
   }
 
   wrong() {
-    this.listePersonnageWrong.push(this.listePersonnageToGuess[this.indexOfProchainPersonnage]);
-    if (this.listePersonnageToGuess.length === (this.indexOfProchainPersonnage + 1)) {
-      this.indexOfProchainPersonnage = 0;
-    } else {
-      this.indexOfProchainPersonnage++;
-    }
+    this.listePersonnageWrong.push(this.listePersonnageToGuess[0]);
+    const persoTemp = this.listePersonnageToGuess[0];
+    this.listePersonnageToGuess.splice(0, 1);
+    this.listePersonnageToGuess.push(persoTemp);
+    this.manche.persoToGuess = this.listePersonnageToGuess;
   }
 
   startround() {
@@ -425,7 +411,6 @@ export class MancheComponent implements OnInit, OnDestroy {
         if (this.aQuiDeJouer.equipe_id === this.equipe2.id) {
           this.manche.equipeCourante = this.equipe2;
         }
-        this.manche.indexjequipe1 = JSON.parse(messages.message.indexJoueurEquipe1);
         this.manche.joueurs_teamComplete = messages.message.jteamcomplete;
         this.manche.joueurs_teamTemp = messages.message.jteamtemp;
         this.manche.mancheactuelle = JSON.parse(messages.message.currentround);
@@ -433,26 +418,27 @@ export class MancheComponent implements OnInit, OnDestroy {
         this.global.melistepersonnagescomplete = this.personnagesComplete;
       }
       if (messages.message.requete === 'getnextplayer') {
-        const player = new Joueur();
-        player.id = messages.message.quijoue.pk;
-        player.equipe_id = messages.message.quijoue.fields.equipe;
-        player.owner_id = messages.message.quijoue.fields.owner;
-        player.username = messages.message.quijoue.fields.username;
-        player.equipe_id = messages.message.quijoue.fields.equipe;
-        player.partiencours = messages.message.quijoue.fields.partiencours;
-        player.readytostart = messages.message.quijoue.fields.readytostart;
-        this.manche.quijoue = player;
+        if  (!localStorage.getItem("aquidejouer")) {
+          const player = new Joueur();
+          player.id = messages.message.quijoue.pk;
+          player.equipe_id = messages.message.quijoue.fields.equipe;
+          player.owner_id = messages.message.quijoue.fields.owner;
+          player.username = messages.message.quijoue.fields.username;
+          player.equipe_id = messages.message.quijoue.fields.equipe;
+          player.partiencours = messages.message.quijoue.fields.partiencours;
+          player.readytostart = messages.message.quijoue.fields.readytostart;
+          this.manche.quijoue = player;
 
-        if (this.aQuiDeJouer.equipe_id === this.equipe1.id) {
-          this.manche.equipeCourante = this.equipe1;
+          if (this.aQuiDeJouer.equipe_id === this.equipe1.id) {
+            this.manche.equipeCourante = this.equipe1;
+          }
+          if (this.aQuiDeJouer.equipe_id === this.equipe2.id) {
+            this.manche.equipeCourante = this.equipe2;
+          }
+          this.manche.joueurs_teamComplete = messages.message.jteamcomplete;
+          this.manche.joueurs_teamTemp = messages.message.jteamtemp;
+          this.global.melistepersonnagescomplete = this.personnagesComplete;
         }
-        if (this.aQuiDeJouer.equipe_id === this.equipe2.id) {
-          this.manche.equipeCourante = this.equipe2;
-        }
-        this.manche.indexjequipe1 = JSON.parse(messages.message.indexJoueurEquipe1);
-        this.manche.joueurs_teamComplete = messages.message.jteamcomplete;
-        this.manche.joueurs_teamTemp = messages.message.jteamtemp;
-        this.global.melistepersonnagescomplete = this.personnagesComplete;
       }
 
       if (messages.message.requete === 'majScoret1') {
@@ -469,7 +455,6 @@ export class MancheComponent implements OnInit, OnDestroy {
         player.equipe_id = messages.message.quijoue.fields.equipe;
         player.owner_id = messages.message.quijoue.fields.owner;
         player.username = messages.message.quijoue.fields.username;
-        player.equipe_id = messages.message.quijoue.fields.equipe;
         player.partiencours = messages.message.quijoue.fields.partiencours;
         player.readytostart = messages.message.quijoue.fields.readytostart;
         this.manche.quijoue = player;
@@ -480,7 +465,6 @@ export class MancheComponent implements OnInit, OnDestroy {
         if (this.aQuiDeJouer.equipe_id === this.equipe2.id) {
           this.manche.equipeCourante = this.equipe2;
         }
-        this.manche.indexjequipe1 = JSON.parse(messages.message.indexJoueurEquipe1);
         this.manche.joueurs_teamComplete = messages.message.jteamcomplete;
         this.manche.joueurs_teamTemp = messages.message.jteamtemp;
         this.manche.manchestart = false;
@@ -567,11 +551,10 @@ export class MancheComponent implements OnInit, OnDestroy {
     this.listePersonnageGoodT1Sub.unsubscribe();
     this.listePersonnageGoodT2Sub.unsubscribe();
     this.listePersonnageToGuessSub.unsubscribe();
-    this.indexJoueurEquipe1Sub.unsubscribe();
     this.timeLeftSub.unsubscribe();
     this.joueursTeamCompleteSub.unsubscribe();
     this.joueursTeamTempSub.unsubscribe();
     this.afficheInterroundSub.unsubscribe();
-    localStorage.setItem('cantcomeback', 'true');
+    //localStorage.setItem('cantcomeback', 'true');
   }
 }

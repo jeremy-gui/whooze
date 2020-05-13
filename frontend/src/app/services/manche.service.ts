@@ -32,11 +32,8 @@ export class MancheService {
   private afficheScoreSource: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public afficheScore = this.afficheScoreSource.asObservable();
 
-  private indexJoueurEquipe1Source: BehaviorSubject<number> = new BehaviorSubject(0);
-  public indexJoueurEquipe1 = this.indexJoueurEquipe1Source.asObservable();
-
-  private indexJoueurEquipe2Source: BehaviorSubject<number> = new BehaviorSubject(0);
-  public indexJoueurEquipe2 = this.indexJoueurEquipe2Source.asObservable();
+  private indexJoueurEquipeSource: BehaviorSubject<number> = new BehaviorSubject(0);
+  public indexJoueurEquipe = this.indexJoueurEquipeSource.asObservable();
 
   private joueursTeamCompleteSource: BehaviorSubject<Joueur[]> = new BehaviorSubject([]);
   public joueursTeamComplete = this.joueursTeamCompleteSource.asObservable();
@@ -69,15 +66,11 @@ export class MancheService {
     this.timerSource.next(time);
   }
 
-  set indexjequipe1(index: number) {
-    localStorage.setItem('indexjoueurequipe1', index.toString());
-    this.indexJoueurEquipe1Source.next(index);
+  set indexjequipe(index: number) {
+    localStorage.setItem('indexjoueurequipe', index.toString());
+    this.indexJoueurEquipeSource.next(index);
   }
 
-  set indexjequipe2(index: number) {
-    localStorage.setItem('indexjoueurequipe2', index.toString());
-    this.indexJoueurEquipe2Source.next(index);
-  }
 
   set persoToGuess(personnage: Personnage[]) {
     localStorage.setItem('persotoguess', JSON.stringify(personnage));
