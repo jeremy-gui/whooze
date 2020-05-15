@@ -260,26 +260,33 @@ export class MancheComponent implements OnInit, OnDestroy {
         this.manche.timerseconde = this.timeLeft;
       } else if (this.timeLeft === 0) {
         clearInterval(this.interval);
-        setTimeout(() => {
-          if (this.listePersonnageToGuess.length > 0 && this.aQuiDeJouer.owner_id === this.account.id) {
+        if (this.aQuiDeJouer.owner_id === this.account.id) {
+          setTimeout(() => {
+            if (this.listePersonnageToGuess.length > 0) {
+              const data = {};
+              this.manche.manchestart = false;
+              this.manche.affichageScore = true;
+              this.listePersonnageWrong.push(this.listePersonnageToGuess[0]);
+              const persoTemp = this.listePersonnageToGuess[0];
+              this.listePersonnageToGuess.splice(0, 1);
+              this.listePersonnageToGuess.push(persoTemp);
+              this.manche.persoToGuess = this.listePersonnageToGuess;
+              data["listePersonnageToGuess"] = this.listePersonnageToGuess;
+              data["currentteam"] = this.equipeEnCours.nom;
+              data["currentround"] = this.mancheEnCours;
+              data["jteamcomplete"] = this.joueursTeamComplete;
+              data["jteamtemp"] = this.joueursTeamTemp;
+              data["liste_personnages"] = this.personnagesComplete;
+              this._partieService.send(data, 'nextplayersameround', this._userService.access_token);
+            } else if (this.listePersonnageToGuess.length === 0) { // si on arrive à la fin de la liste
+              this.endround();
+            }
+          }, 3000);
+        } else {
+          setTimeout(() => {
 
-            const data = {};
-            this.manche.manchestart = false;
-            this.manche.affichageScore = true;
-            this.listePersonnageWrong.push(this.listePersonnageToGuess[0]);
-            const persoTemp = this.listePersonnageToGuess[0];
-            this.listePersonnageToGuess.splice(0, 1);
-            this.listePersonnageToGuess.push(persoTemp);
-            this.manche.persoToGuess = this.listePersonnageToGuess;
-            data["listePersonnageToGuess"] = this.listePersonnageToGuess;
-            data["currentteam"] = this.equipeEnCours.nom;
-            data["currentround"] = this.mancheEnCours;
-            data["jteamcomplete"] = this.joueursTeamComplete;
-            data["jteamtemp"] = this.joueursTeamTemp;
-            data["liste_personnages"] = this.personnagesComplete;
-            this._partieService.send(data, 'nextplayersameround', this._userService.access_token);
-          }
-        }, 3000);
+          },  500);
+        }
       }
     }, 1000);
   }
@@ -310,32 +317,8 @@ export class MancheComponent implements OnInit, OnDestroy {
     this.listePersonnageToGuess.splice(0, 1);
     this.manche.persoToGuess = this.listePersonnageToGuess;
     if (this.listePersonnageToGuess.length === 0) { // si on arrive à la fin de la liste
-      if ((this.mancheEnCours +  1) === 4) { // si on arrive à la fin du jeu
-        this.pause();
-        const data = {};
-        data["egalite"] = false;
-        data["score2"] = this.listePersonnageGoodT2.length;
-        data["score1"] = this.listePersonnageGoodT1.length;
-        if (data["score1"] > data["score2"]) {
-          data["equipegagnante"] = this.equipe1;
-        } else if (data["score2"] > data["score1"]) {
-          data["equipegagnante"] = this.equipe2;
-        } else if (data["score1"] === data["score2"]) {
-          data["egalite"] = true;
-        }
-        this._partieService.send(data, "theend", this._userService.access_token);
-      } else { // si on passe au round suivant
-        const data = {};
-        this.pause();
-        data["listePersonnageToGuess"] = this.listePersonnageToGuess;
-        data["currentteam"] = this.equipeEnCours.nom;
-        data["currentround"] = this.mancheEnCours;
-        data["jteamcomplete"] = this.joueursTeamComplete;
-        data["jteamtemp"] = this.joueursTeamTemp;
-        data["liste_personnages"] = this.shuffle(this.personnagesComplete);
-        this._partieService.send(data,'nextround', this._userService.access_token);
-      }
-
+      this.pause();
+      this.endround();
     }
   }
 
@@ -353,6 +336,32 @@ export class MancheComponent implements OnInit, OnDestroy {
       this._partieService.send(this.listePersonnageToGuess, 'startround1', this._userService.access_token);
     } else if (this.listePersonnageToGuess.length === 0) {
       this._partieService.send('', 'startround1', this._userService.access_token);
+    }
+  }
+
+  endround() {
+    if ((this.mancheEnCours +  1) === 4) { // si on arrive à la fin du jeu
+      const data = {};
+      data["egalite"] = false;
+      data["score2"] = this.listePersonnageGoodT2.length;
+      data["score1"] = this.listePersonnageGoodT1.length;
+      if (data["score1"] > data["score2"]) {
+        data["equipegagnante"] = this.equipe1;
+      } else if (data["score2"] > data["score1"]) {
+        data["equipegagnante"] = this.equipe2;
+      } else if (data["score1"] === data["score2"]) {
+        data["egalite"] = true;
+      }
+      this._partieService.send(data, "theend", this._userService.access_token);
+    } else { // si on passe au round suivant
+      const data = {};
+      data["listePersonnageToGuess"] = this.listePersonnageToGuess;
+      data["currentteam"] = this.equipeEnCours.nom;
+      data["currentround"] = this.mancheEnCours;
+      data["jteamcomplete"] = this.joueursTeamComplete;
+      data["jteamtemp"] = this.joueursTeamTemp;
+      data["liste_personnages"] = this.shuffle(this.personnagesComplete);
+      this._partieService.send(data,'nextround', this._userService.access_token);
     }
   }
   connect(code) {
@@ -448,8 +457,6 @@ export class MancheComponent implements OnInit, OnDestroy {
         this.manche.personnageOkT2 = messages.message.score2;
       }
       if (messages.message.requete === 'nextplayersameround') {
-
-
         const player = new Joueur();
         player.id = messages.message.quijoue.pk;
         player.equipe_id = messages.message.quijoue.fields.equipe;

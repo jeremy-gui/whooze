@@ -1,4 +1,4 @@
-<h2 class="mb-5 title-custom" *ngIf="this.theend === false">Round #{{this.mancheEnCours}}</h2> - <h2 class="mb-5 title-custom" *ngIf="this.theend === false" [ngClass]="{ 'text-info' : this.equipeEnCours.nom === '1', 'text-warning' : this.equipeEnCours.nom === '2'}" >Team {{this.equipeEnCours.nom}}</h2>
+<h2 class="mb-5 title-custom" *ngIf="this.theend === false">Round #{{this.mancheEnCours}}</h2>  <h2 class="mb-5 title-custom" *ngIf="this.theend === false" [ngClass]="{ 'text-info' : this.equipeEnCours.nom === '1', 'text-warning' : this.equipeEnCours.nom === '2'}" >Team {{this.equipeEnCours.nom}}</h2>
 <div class="container" *ngIf="this.theend === false">
   <!-- Quand c'est le tout debut : manche 1 aucun joueur n'a joue
   -->

@@ -260,14 +260,6 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
       takeUntil(this.destroyed$)
     ).subscribe(messages => {
       if (messages.message.requete === 'get_team1') {
-         if (messages.message.newpartie === 'True') { //si le craeteur a quitter la partie et que ce joueur reprends le owner
-           this._partieService.getPartieFromId(this.partie.id).subscribe(res => {
-             this.partie = res;
-             this.partie.owner_id = res.owner.id;
-             this.global.megame = this.partie;
-
-           });
-         }
           const result = JSON.parse(messages.message.equipe);
             this.global.joueurs_team1 = [];
             result.forEach(element => {
