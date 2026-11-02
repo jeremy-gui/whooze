@@ -482,10 +482,15 @@ export class MancheComponent implements OnInit, OnDestroy {
         this.global.melistepersonnagescomplete = this.personnagesComplete;
       }
       if (messages.message.requete === 'theend') {
+        this.pause();
         this.theend = true;
-        this.egalite = messages.message.egalite;
+        // Without this, the next game in this browser would resume the state of this one.
+        Object.keys(localStorage)
+          .filter(key => !['account', 'access_token', 'refresh_token'].includes(key))
+          .forEach(key => localStorage.removeItem(key));
+        this.egalite = messages.message.data.egalite;
         if (!this.egalite) {
-          this.teamwin = messages.message.equipegagnante;
+          this.teamwin = messages.message.data.equipegagnante;
         }
       }
     });
@@ -526,9 +531,11 @@ export class MancheComponent implements OnInit, OnDestroy {
     });
     this.global.joueurs_team2 = this.joueursTeam2;
   }
-  shuffle(array) {
+  // Returns a copy: the names to guess get consumed, the complete list must survive for the next round.
+  shuffle(list) {
+    const array = [...list];
     for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i);
+      const j = Math.floor(Math.random() * (i + 1));
       const temp = array[i];
       array[i] = array[j];
       array[j] = temp;

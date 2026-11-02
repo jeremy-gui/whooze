@@ -109,7 +109,8 @@ export class UserService {
     const token_decoded = JSON.parse(window.atob(token_parts[1]));
     this.token_expires = token_decoded.exp * 1000;
     this.user = new User();
-    this.user.id = token_decoded.user_id;
+    // SimpleJWT sends the id as a string; the app compares it with numeric ids from the API.
+    this.user.id = Number(token_decoded.user_id);
   }
 
   loginUser(userData: any): Observable<any> {

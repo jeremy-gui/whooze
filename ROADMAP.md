@@ -7,7 +7,7 @@
 - Move the game state to the server. Turn order, remaining names and scores are currently computed in the browser of the
   active player and relayed, so a closed tab can stall a game.
 - Stop sending the access token in the WebSocket URL: use a short-lived single-use ticket.
-- Add automated end-to-end tests of a full four-player game, including team 2 scoring.
+- Add automated end-to-end tests of a full four-player game.
 
 ## Then
 
