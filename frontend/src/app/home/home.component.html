@@ -1,0 +1,13 @@
+<div *ngIf="!_userService.connected">
+  <div>
+  <button routerLink="login" type="button" class="btn btn-primary btn-block">Login</button>
+  <button routerLink="signup" type="button" class="btn btn-primary btn-block">Sign-up</button>
+  </div>
+</div>
+
+<div *ngIf="_userService.connected">
+  <div>
+    <button routerLink="chooseusername" [state]="{data: {'creategame' : true}}" type="button"  class="btn btn-primary btn-block mb-4">Create new game</button>
+    <button routerLink="chooseusername" [state]="{data: {'joingame' : true}}" type="button"  class="btn btn-primary btn-block">Join existing game</button>
+  </div>
+</div>

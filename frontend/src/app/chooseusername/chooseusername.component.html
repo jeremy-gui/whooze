@@ -1,0 +1,26 @@
+<!--<h1 class="text-center">{{title}}</h1>-->
+<div class="w-50 text-center m-auto ">
+
+  <form class="text-center justify-content-center p-5" [formGroup]="registerForm" name="registerForm" (ngSubmit)="onSubmit()">
+
+    <h2 class="mb-4 title-custom">Choose a username</h2>
+
+    <!--  <input type="text" placeholder="Username" formControlName="username" class="form-control mb-4" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
+      <div *ngIf="submitted && f.username.errors" class="invalid-feedback mb-4">
+        <div *ngIf="f.username.errors.required">Username is required</div>
+        <div *ngIf="f.username.errors.minlength">Username must be at least 3 characters</div>
+        <div *ngIf="f.username.errors.maxlength">Username must be a maximum of 20 characters</div>
+      </div>-->
+  <input  type="text" placeholder="Username" formControlName="username" class="justify-content-center  form-control mb-4 w-50 ml-auto mr-auto" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
+
+     <div *ngIf="submitted && f.username.errors" class="invalid-feedback mb-4">
+      <div *ngIf="f.username.errors.required">Username is required</div>
+      <div *ngIf="f.username.errors.minlength">Username must be at least 3 characters</div>
+      <div *ngIf="f.username.errors.maxlength">Username must be a maximum of 20 characters</div>
+    </div>
+    <div class="row justify-content-between mb-4">
+      <a role="button" routerLink="/" class="btn btn-danger w-25">Cancel</a>
+      <button type="submit" class="btn btn-primary w-25">Next</button>
+    </div>
+  </form>
+</div>
