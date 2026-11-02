@@ -4,7 +4,7 @@ from django.test import TransactionTestCase, override_settings
 from rest_framework.test import APIClient
 
 from times.asgi import application
-from timesapp.models import User
+from timesapp.models import Equipe, User
 
 PASSWORD = 'Str0ng-test-pass'
 IN_MEMORY = {'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'}}
@@ -58,6 +58,7 @@ class WhoozeTests(TransactionTestCase):
         self.assertIn('"username": "Alice"', answer['equipe'])
         await ws.send_json_to({'message': [1, 2], 'requete': 'majScoret2', 'token': token})
         self.assertEqual((await ws.receive_json_from())['message']['score2'], [1, 2])
+        self.assertEqual((await Equipe.objects.aget(partie_id=partie['id'], nom='2')).score, 2)
         await ws.disconnect()
 
         bad = WebsocketCommunicator(application, f'/ws/timesapp/chat/{code}/not-a-token/')

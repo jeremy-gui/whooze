@@ -59,7 +59,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [(os.environ.get('REDIS_HOST', '127.0.0.1'), 6379)],
+            # redis-py's default 5 s socket timeout equals the channel layer's 5 s blocking read and kills consumers.
+            "hosts": [{"address": f"redis://{os.environ.get('REDIS_HOST', '127.0.0.1')}:6379", "socket_timeout": 30}],
         },
     },
 }
