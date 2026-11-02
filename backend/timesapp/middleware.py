@@ -15,15 +15,19 @@ class TokenAuthMiddleware:
         self.inner = inner
 
     def __call__(self, scope):
-        close_old_connections()
+
         query_string = parse_qs(scope['query_string'].decode())
         token = query_string.get('token')
+        access_token = AccessToken(token[0])
+        print(access_token)
         if not token:
             scope['user'] = AnonymousUser()
             return self.inner(scope)
         try:
             access_token = AccessToken(token[0])
+            print(access_token)
             user = User.objects.get(id=access_token['id'])
+
         except Exception as exception:
             scope['user'] = AnonymousUser()
             return self.inner(scope)

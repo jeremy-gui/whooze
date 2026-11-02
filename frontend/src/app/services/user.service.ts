@@ -3,7 +3,7 @@ import {HttpClient, HttpEvent, HttpHeaders} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {User} from '../models/user';
 import {environment} from '../../environments/environment';
-import {mergeMap} from 'rxjs/operators';
+import {mergeMap, switchMap} from 'rxjs/operators';
 
 
 @Injectable()
@@ -56,7 +56,11 @@ export class UserService {
   }
   // Refreshes the JWT token, to extend the time the user is logged in
   public refreshToken(tok: any): Observable<HttpEvent<any>> {
-    return this.http.post(`${this.authUrl}api-token-refresh/`, JSON.stringify({refresh: tok}), this.httpOptions);
+    return this.http.post<HttpEvent<any>>(`${this.authUrl}api-token-refresh/`,JSON.stringify({refresh: tok}),  this.httpOptions);
+  }
+  public askForUpdateToken(tok: any): Observable<any> {
+      return this.http.post(`${this.authUrl}api-token-refresh/`,JSON.stringify({refresh: tok}),  this.httpOptions);
+
   }
 
    verifyToken(token: any): any {

@@ -27,47 +27,44 @@ import {switchMap, tap} from 'rxjs/operators';
           if (tokisgood) {
             return this._userService.refreshToken(tokenrefresh).pipe(
               switchMap(result => {
-              this._userService.updateData(result['access'], result['refresh']);
-              this._userService.connected = true;
-              token = result['access'];
-              tokenrefresh = result['refresh'];
+                //console.log(result);
+                this._userService.updateData(result['access'], result['refresh']);
+                this._userService.connected = true;
+                token = result['access'];
+                tokenrefresh = result['refresh'];
 
-              localStorage.setItem('access_token', token);
-              localStorage.setItem('refresh_token', tokenrefresh);
-              clone = request.clone({
-                setHeaders: {
-                  Accept: `application/json`,
-                  'Content-Type': `application/json`,
-                  Authorization: `Bearer ${token}`
-                }
-              });
-              console.log('new token');
-              console.log(clone.headers);
-              return next.handle(clone);
+                localStorage.setItem('access_token', token);
+                localStorage.setItem('refresh_token', tokenrefresh);
+                clone = request.clone({
+                  setHeaders: {
+                    Accept: `application/json`,
+                    'Content-Type': `application/json`,
+                    Authorization: `Bearer ${token}`
+                  }
+                });
+                return next.handle(clone);
             })
             );
           }
         } else {
-          console.log('token not good');
           clone = request.clone({
             setHeaders: {
               Accept: `application/json`,
               'Content-Type': `application/json`
             }
           });
-          console.log(clone.url+request.url);
+
           return next.handle(clone);
 
         }
       } else {
-        console.log('not refresh');
         clone = request.clone({
           setHeaders: {
             Accept: `application/json`,
             'Content-Type': `application/json`
           }
         });
-        console.log(clone.url+request.url);
+
         return next.handle(clone);
 
       }

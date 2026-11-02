@@ -17,6 +17,7 @@ export class PartieService {
 
   authUrl: string = environment.authUrl;
   tokUrl: string = environment.tokUrl;
+  WSUrl: string = environment.WSUrl;
   public partie: Partie;
   public  partieCreated = false;
   connection$: WebSocketSubject<any>;
@@ -30,10 +31,10 @@ export class PartieService {
 
 
   connect(codepartie: any, token: any): Observable<any> {
-    return of(this.authUrl).pipe(
-      filter(authUrl => !!authUrl),
+    return of(this.WSUrl).pipe(
+      filter(WSUrl => !!WSUrl),
       // https becomes wws, http becomes ws
-      map(authUrl => authUrl.replace(/^http/, 'ws') + 'ws/timesapp/chat/'+codepartie+'/?token='+token+'/'),
+      map(WSUrl => WSUrl.replace(/^http/, 'ws') + 'ws/timesapp/chat/'+codepartie+'/'+token+'/'),
       switchMap(wsUrl => {
         if (this.connection$) {
           return this.connection$;
@@ -52,11 +53,12 @@ export class PartieService {
       this.connection$ = null;
     }
   }
-  send(data: any, ask: any) {
+  send(data: any, ask: any, _token: string) {
     if (this.connection$) {
       const payload = {
         requete: ask,
         message: data,
+        token: _token
       };
       this.connection$.next(payload);
     }
