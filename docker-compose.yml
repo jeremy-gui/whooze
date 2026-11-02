@@ -1,0 +1,30 @@
+# cp .env.example .env, fill it in, then docker compose up -d --build
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  app:
+    build: ./backend
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set it in .env}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_DB_PATH: /data/db.sqlite3
+      REDIS_HOST: redis
+    volumes:
+      - data:/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      # Loopback by default: put an HTTPS reverse proxy in front before exposing it (see README.md).
+      - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-8080}:80"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  data:

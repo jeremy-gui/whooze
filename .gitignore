@@ -1,0 +1,16 @@
+# Secrets and local data
+.env
+.env.*
+!.env.example
+*.sqlite3
+
+# Dependencies and build output
+venv/
+node_modules/
+__pycache__/
+dist/
+staticfiles/
+
+# Editors
+.idea/
+.vscode/
