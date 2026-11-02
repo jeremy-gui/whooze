@@ -1,5 +1,4 @@
-# ponytail: Python 3.8 matches the 2020 pinned dependencies; move up with the upgrade planned in ROADMAP.md.
-FROM python:3.8
+FROM python:3.14-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

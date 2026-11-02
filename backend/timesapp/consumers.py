@@ -1,20 +1,17 @@
 import json
 from random import shuffle
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.authentication import JWTAuthentication, JWTTokenUserAuthentication
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from channels.auth import login
-from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from djangochannelsrestframework.consumers import AsyncAPIConsumer
 from django.core import serializers
 
 
 from timesapp.models import Partie, Joueur, Equipe, User, Personnage
-from timesapp.serializers import userSerializer, joueurSerializer, partieSerializer
 
 
-class PartieConsumer(AsyncAPIConsumer):
+class PartieConsumer(AsyncWebsocketConsumer):
     currentround = 0
     currentteam = 1
     prochainJoueur = ""
@@ -34,7 +31,11 @@ class PartieConsumer(AsyncAPIConsumer):
 
 
 
-        user = await self.verifyToken(user['user'])
+        try:
+            user = await self.verifyToken(user['user'])
+        except AuthenticationFailed:
+            await self.close()
+            return
 
         await login(self.scope, user)
         await database_sync_to_async(self.scope["session"].save)()
@@ -95,7 +96,7 @@ class PartieConsumer(AsyncAPIConsumer):
         score = len(data)
         equipe = Equipe.objects.get(partie_id=idPartie, nom='2')
         Equipe.objects.filter(pk=equipe.pk).update(score=score)
-        equipe = Equipe.objects.get(partie_id=idPartie, nom='1')
+        equipe = Equipe.objects.get(partie_id=idPartie, nom='2')
         self.scope['equipe2'] = equipe
 
         return data
@@ -160,7 +161,7 @@ class PartieConsumer(AsyncAPIConsumer):
         self.scope['partie'] = data
         return  serializers.serialize("json", data)
 
-    async def receive(self, text_data):
+    async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
 
         message = text_data_json['message']
@@ -471,7 +472,7 @@ class PartieConsumer(AsyncAPIConsumer):
                 )
 
             if (requete == 'message') :
-                tellme = user.email + " say : " + message
+                tellme = message
                 data = {}
                 data["requete"] = requete
                 data["message"] = tellme
@@ -496,7 +497,7 @@ class PartieConsumer(AsyncAPIConsumer):
                 self.room_group_name,
                 {
                     'type': 'chat_message',
-                    'message': self.scope['user'].email+" say : " + message
+                    'message': message
                 }
             )
 

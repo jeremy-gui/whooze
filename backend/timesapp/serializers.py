@@ -1,16 +1,14 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from .models import Partie, Joueur, User, Equipe, Personnage
 
 
 class userSerializer(serializers.ModelSerializer):
-    parties = serializers.PrimaryKeyRelatedField(many=True, queryset=Partie.objects.all())
-    joueurs = serializers.PrimaryKeyRelatedField(many=True, queryset=Joueur.objects.all())
-
     class Meta:
         model = User
-        fields = ['id', 'email', 'parties', 'joueurs']
+        fields = ['id']
 
 
 class partieSerializer(serializers.ModelSerializer):
@@ -47,46 +45,18 @@ class personnageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, data):
-        return data
-
-    def create(self, validated_data):
-        data = {
-            key: value for key, value in validated_data.items()
-            if key not in ('password')
-        }
-        data['password'] = validated_data['password']
-        return self.Meta.model.objects.create_user(**data)
-
     class Meta:
         model = get_user_model()
-        fields = (
-            'id', 'email', 'password', 'parties', 'joueurs'
-        )
-        read_only_fields = ('id',)
+        fields = ('id', 'email')
+        read_only_fields = fields
 
-class UserSerializerWithToken(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    token = serializers.SerializerMethodField()
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        user_data = UserSerializer(user).data
-        for key, value in user_data.items():
-            if key != 'id':
-                token[key] = value
-        return token
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
 
     def create(self, validated_data):
-        user = User.objects.create(
-            email=validated_data['email']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+        return User.objects.create_user(**validated_data)
 
     class Meta:
         model = User
-        fields = ('token', 'email', 'password', 'parties', 'joueurs')
+        fields = ('email', 'password')
