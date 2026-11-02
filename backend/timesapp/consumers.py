@@ -41,7 +41,6 @@ class PartieConsumer(AsyncAPIConsumer):
         if(user.is_authenticated):
 
             self.scope['user'] = user
-            print(self.scope["user"])
 
             # Join room group
             await self.channel_layer.group_add(
@@ -52,7 +51,6 @@ class PartieConsumer(AsyncAPIConsumer):
 
 
     async def disconnect(self, close_code):
-        print(self.scope["user"])
 
 
 

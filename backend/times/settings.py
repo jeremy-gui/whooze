@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+from django.core.exceptions import ImproperlyConfigured
 import os
 import sys
 import asyncio
@@ -24,12 +25,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'removed-from-history'
+DEBUG = os.environ.get('DJANGO_DEBUG') == '1'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or ('dev-only-key' if DEBUG else None)
+if not SECRET_KEY:
+    raise ImproperlyConfigured('Set DJANGO_SECRET_KEY (or DJANGO_DEBUG=1 for local development).')
 
-ALLOWED_HOSTS = ['192.0.2.20', '*', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -57,21 +59,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-CORS_ORIGIN_WHITELIST = [
-    "https://www.example.com",
-    "http://www.example.com",
-    "https://example.com",
-    "http://example.com",
-    "https://api.example.com",
-    "http://api.example.com",
-    "ws://api.example.com",
-    "wss://api.example.com",
-    "https://localhost:8000",
-    "https://localhost:9000",
-    "http://localhost:8080",
-    "http://127.0.0.1:9000",
-    "http://127.0.0.1:8000"
-]
 ROOT_URLCONF = 'times.urls'
 
 ASGI_APPLICATION = 'times.routing.application'
@@ -80,7 +67,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(os.environ.get('REDIS_HOST', '127.0.0.1'), 6379)],
         },
     },
 }
@@ -109,13 +96,14 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.environ.get('DJANGO_DB_PATH', os.path.join(BASE_DIR, 'db.sqlite3')),
     }
 }
 
 AUTH_USER_MODEL = 'timesapp.User'
 
-CORS_ORIGIN_ALLOW_ALL = True
+# The Docker setup serves the app and the API on one origin; only `ng serve` needs CORS.
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -153,10 +141,6 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
