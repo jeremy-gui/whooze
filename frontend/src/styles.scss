@@ -1,0 +1,107 @@
+@import "../static/fonts/fonts.scss";
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Chelsea+Market&display=swap');
+
+$enable-responsive-font-sizes: true;
+
+body {
+  font-family: 'Anton', sans-serif;
+}
+
+.titrename {
+  font-family: 'Chelsea Market', cursive;
+}
+
+h1 {
+  font-family: 'Chelsea Market', cursive;
+  @include responsive-font-size(8vw);
+}
+
+h2 {
+  font-family: 'Chelsea Market', cursive;
+}
+
+.title-custom {
+  position: static;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Breakpoint for extra-small viewport */
+@include media-breakpoint-up(xs) {
+  .input-group {
+    width: 75vw;
+  }
+  .title-custom {
+    position: absolute;
+    top:2vw;
+    margin-left: 15vw;
+    text-align: left;
+    width: 70vw
+  }
+
+}
+/* Breakpoint for small viewport */
+@include media-breakpoint-up(sm) {
+  .input-group {
+    width: 75vw;
+  }
+  .title-custom {
+    position: absolute;
+    top:2vw;
+    margin-left: 15vw;
+    text-align: left;
+    width: 70vw
+  }
+}
+/* Breakpoint for medium viewport */
+@include media-breakpoint-up(md) {
+  .input-group {
+    width: 50vw;
+  }
+  .title-custom {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+}
+
+/* Breakpoint for large viewport */
+@include media-breakpoint-up(lg) {
+  .input-group {
+    width: 50vw;
+  }
+  .title-custom {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+}
+/* Breakpoint for extra-large viewport */
+@include media-breakpoint-up(xl) {
+  .input-group {
+    width: 50vw;
+  }
+  .title-custom {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+}
+
+h2 {
+  @include responsive-font-size(4vw);
+}
+
+
+
+
+
+

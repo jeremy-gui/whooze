@@ -1,0 +1,119 @@
+<h2 class="mb-5 title-custom" *ngIf="this.theend === false">Round #{{this.mancheEnCours}}</h2>  <h2 class="mb-5 title-custom" *ngIf="this.theend === false" [ngClass]="{ 'text-info' : this.equipeEnCours.nom === '1', 'text-warning' : this.equipeEnCours.nom === '2'}" >Team {{this.equipeEnCours.nom}}</h2>
+<div class="container" *ngIf="this.theend === false">
+  <!-- Quand c'est le tout debut : manche 1 aucun joueur n'a joue
+  -->
+  <div *ngIf="!this.mancheStarted && !this.afficheScore && !this.afficheInterround" class=" justify-content-center playertostart text-center">
+    <h2 class="justify-content-center text-center pt-5" >{{this.aQuiDeJouer.username}}<span *ngIf="this.aQuiDeJouer.owner_id === this.account.id"> you are</span><span *ngIf="this.aQuiDeJouer.owner_id != this.account.id"> is</span> the next player!</h2>
+    <h3 class="justify-content-center text-center pt-5 text-danger" ><span *ngIf="(this.aQuiDeJouer.owner_id === this.account.id) && this.mancheEnCours === 1"> Describe the character</span><span *ngIf="(this.aQuiDeJouer.owner_id != this.account.id) &&  this.mancheEnCours === 1"> The character must be described</span></h3>
+
+    <button (click)="startround()" *ngIf="this.aQuiDeJouer.owner_id === this.account.id" type="button" class="btn btn-primary mt-5">Start round {{this.mancheEnCours}}!</button>
+
+  </div>
+  <!-- si meme manche mais entre deux joueurs    -->
+  <div *ngIf="this.afficheScore && !this.mancheStarted" class=" justify-content-center playertostart text-center">
+    <div class=" mb-5">
+      <h2 class="justify-content-center text-center pt-5" >{{this.aQuiDeJouer.username}}<span *ngIf="this.aQuiDeJouer.owner_id === this.account.id"> you are</span><span *ngIf="this.aQuiDeJouer.owner_id != this.account.id"> is</span> the next player!</h2>
+      <h3 class="justify-content-center text-center pt-5 text-danger" ><span *ngIf="(this.aQuiDeJouer.owner_id === this.account.id) && this.mancheEnCours === 1"> Describe the character</span><span *ngIf="(this.aQuiDeJouer.owner_id != this.account.id) &&  this.mancheEnCours === 1"> The character must be described</span></h3>
+    </div>
+    <div class="container">
+      <div class="row d-flex justify-content-center" *ngIf="(this.aQuiDeJouer.owner_id === this.account.id)">
+
+        <div class="col">
+          <button (click)="startround()" *ngIf="this.aQuiDeJouer.owner_id === this.account.id" type="button" class="btn btn-primary mt-5">Start <span *ngIf="this.afficheInterround">round {{this.mancheEnCours}}!</span> </button>
+        </div>
+
+      </div>
+      <div *ngIf="(this.aQuiDeJouer.owner_id != this.account.id)">
+        <div class="row d-flex justify-content-center">
+          <div class="col d-flex justify-content-center"><h3 class="text-info">{{this.listePersonnageGoodT1.length}}</h3>
+          </div>
+          <div class="col d-flex justify-content-center">
+
+          </div>
+          <div class="col d-flex justify-content-center"><h3 class="text-warning">{{this.listePersonnageGoodT2.length}}</h3>
+          </div>
+        </div>
+        <div class="row d-flex justify-content-center" >
+          <div class="col d-flex justify-content-center" >
+            <h3 class="text-info">For team 1</h3>
+          </div>
+          <div class="col">
+          </div>
+          <div class="col d-flex justify-content-center" >
+            <h3 class="text-warning">For team 2</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- si une manche à démarrer apres avoir indiquer 'start'   -->
+  <div *ngIf="!this.afficheScore && this.mancheStarted && !this.afficheInterround" class="mancheencours">
+    <div class=" mb-5">
+      <h1 class="text-center pt-5" *ngIf="(this.aQuiDeJouer.owner_id === this.account.id) && this.listePersonnageToGuess[this.indexOfProchainPersonnage]">{{this.listePersonnageToGuess[this.indexOfProchainPersonnage].nom}}</h1>
+      <h1 class="text-center"  *ngIf="(this.aQuiDeJouer.owner_id != this.account.id) && this.mancheStarted">{{this.aQuiDeJouer.username}} is playing</h1>
+    </div>
+    <div class="container">
+      <div class="row d-flex justify-content-center" *ngIf="(this.aQuiDeJouer.owner_id === this.account.id)">
+        <div class="col d-flex justify-content-center" *ngIf="(this.aQuiDeJouer.owner_id === this.account.id) && this.listePersonnageToGuess[this.indexOfProchainPersonnage]">
+          <button class="btn btn-danger w-50 btn-custom" (click)="wrong()">X</button>
+        </div>
+        <div class="col">
+          <h1 class="text-center" *ngIf="this.mancheStarted" [ngClass]="{ 'text-black-50' : this.timeLeft > 5}" [ngClass]="{ 'text-danger' : this.timeLeft <= 5}">{{this.timeLeft}} <sup> ''</sup></h1>
+          <!--<button class="btn btn-danger w-50 btn-custom" (click)="pause()">pause</button>
+          <button class="btn btn-danger w-50 btn-custom" (click)="resume()">resume</button>!-->
+        </div>
+        <div class="col d-flex justify-content-center" *ngIf="(this.aQuiDeJouer.owner_id === this.account.id) && this.listePersonnageToGuess[this.indexOfProchainPersonnage]">
+          <button class="btn btn-primary w-50 btn-custom" (click)="nextName()">V</button>
+        </div>
+      </div>
+
+
+      <div *ngIf="(this.aQuiDeJouer.owner_id != this.account.id)">
+        <div class="row d-flex justify-content-center">
+          <div class="col d-flex justify-content-center"><h3 class="text-info">{{this.listePersonnageGoodT1.length}}</h3>
+          </div>
+          <div class="col d-flex justify-content-center"></div>
+          <div class="col d-flex justify-content-center"><h3 class="text-warning">{{this.listePersonnageGoodT2.length}}</h3>
+          </div>
+        </div>
+        <div class="row d-flex justify-content-center" >
+          <div class="col d-flex justify-content-center" >
+            <h3 class="text-info">For team 1</h3>
+          </div>
+          <div class="col">
+            <h1 class="text-center" *ngIf="this.mancheStarted" [ngClass]="{ 'text-black-50' : this.timeLeft > 5}" [ngClass]="{ 'text-danger' : this.timeLeft <= 5}">{{this.timeLeft}} <sup> ''</sup></h1>
+          </div>
+          <div class="col d-flex justify-content-center" >
+            <h3 class="text-warning">For team 2</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container" *ngIf="this.theend === true">
+      <h2 *ngIf="this.egalite">No winners, no loosers, we have a tie!</h2>
+  <h2 *ngIf="!this.egalite">Team {{this.teamwin.nom}} win, bravo!</h2>
+      <div class="row d-flex justify-content-center">
+        <div class="col d-flex justify-content-center"><h3 class="text-info">{{this.listePersonnageGoodT1.length}}</h3>
+        </div>
+        <div class="col d-flex justify-content-center">
+
+        </div>
+        <div class="col d-flex justify-content-center"><h3 class="text-warning">{{this.listePersonnageGoodT2.length}}</h3>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-center" >
+        <div class="col d-flex justify-content-center" >
+          <h3 class="text-info">For team 1</h3>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col d-flex justify-content-center" >
+          <h3 class="text-warning">For team 2</h3>
+        </div>
+      </div>
+
+</div>
+
+
