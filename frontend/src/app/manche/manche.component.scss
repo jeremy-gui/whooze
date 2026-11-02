@@ -1,0 +1,22 @@
+
+@import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/variables";
+@import "../../../node_modules/bootstrap/scss/mixins";
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+
+$enable-responsive-font-sizes: true;
+
+
+h2 {
+  @include responsive-font-size(5vw);
+}
+
+h3 {
+  @include responsive-font-size(3vw);
+}
+
+.btn-custom {
+  @include responsive-font-size(5vw);
+}
+
+

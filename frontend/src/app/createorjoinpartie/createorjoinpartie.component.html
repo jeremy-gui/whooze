@@ -1,0 +1,23 @@
+<h2 class="text-center mb-5 title-custom">Give this code to your friends : {{this.partie.code_unique}}</h2>
+<h4 class="text-danger text-center mb-5">{{this.messageErreur}}</h4>
+<div class="container justify-content-center">
+  <div class="row text-center justify-content-center">
+    <div class="col team-1">
+      <h3 class="text-info">Team 1</h3>
+      <ul class="listPlayer">
+        <li  *ngFor="let j of joueursTeam1"  [className]="this.joueur.id == j.id ? 'list-group-item text-info h4 list-group-item-info' : 'border-info list-group-item text-info h4'">{{j.username}}</li>
+      </ul>
+    </div>
+    <div class="col text-center justify-content-center">
+      <div class="row"><button type="button" (click)="GoToTeam1()" class="btn btn-primary btn-block btn-info text-white w-50 mb-5">Go to team 1</button></div>
+      <div class="row"><button type="button" (click)="GoToTeam2()" class="btn btn-primary btn-block btn-warning text-white w-50 mb-5">Go to team 2</button></div>
+      <div class="row"><button *ngIf="this.partie.owner_id === this.account.id" type="button" (click)="StartGame()" class="btn btn-primary btn-block btn-primary text-white w-50 ">Start Game</button></div>
+    </div>
+    <div class="col team-2">
+      <h3 class="text-warning ">Team 2</h3>
+      <ul class="listPlayer list-group">
+        <li  *ngFor="let j of joueursTeam2" [className]="this.joueur.id === j.id ? 'list-group-item text-warning h4 list-group-item-warning' : ' list-group-item text-warning h4'">{{j.username}}</li>
+      </ul>
+    </div>
+  </div>
+</div>
