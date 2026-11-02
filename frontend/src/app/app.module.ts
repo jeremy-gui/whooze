@@ -1,8 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {ErrorHandler, NgModule} from '@angular/core';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {NgModule} from '@angular/core';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr} from '@angular/common/http';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {UserService, GlobalService, JoueurService} from './services/services.index';
@@ -30,15 +29,14 @@ import {JwtInterceptor} from './jwt.interceptor';
     EntercodeComponent
   ],
   imports: [
-    HttpClientModule,
     BrowserModule,
     FormsModule,
-    NgbModule,
     APP_ROUTING,
     ReactiveFormsModule,
     MainModule
   ],
-  providers: [UserService, GlobalService, JoueurService, PartieService, EquipeService, PersonnageService, MancheService,
+  providers: [provideHttpClient(withInterceptorsFromDi(), withXhr()),
+      UserService, GlobalService, JoueurService, PartieService, EquipeService, PersonnageService, MancheService,
       { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {User} from '../models/user';
 import {Subscription} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
@@ -9,6 +9,8 @@ import {Router} from '@angular/router';
 import {PartieService} from '../services/partie.service';
 
 @Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-entercode',
   templateUrl: './entercode.component.html',
   styleUrls: ['./entercode.component.css']

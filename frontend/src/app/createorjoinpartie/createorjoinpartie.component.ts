@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {GlobalService} from '../services/global.service';
 import {JoueurService} from '../services/joueur.service';
 import {Router} from '@angular/router';
@@ -12,11 +12,12 @@ import {Equipe} from '../models/equipe';
 import {EquipeService} from '../services/equipe.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {Message} from '@angular/compiler/src/i18n/i18n_ast';
 import {FormControl} from '@angular/forms';
 import {UserService} from '../services/user.service';
 
 @Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-createorjoinpartie',
   templateUrl: './createorjoinpartie.component.html',
   styleUrls: ['./createorjoinpartie.component.css']
@@ -38,7 +39,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
   joueursTeam1: Joueur[] = new  Array();
   joueursTeam2Sub: Subscription;
   joueursTeam2: Joueur[] = new  Array();
-  messages: Message[] = [];
+  messages: any[] = [];
   msgCtrl = new FormControl('');
   destroyed$ = new Subject();
   messageErreur: string = '';
@@ -243,7 +244,7 @@ export class CreateorjoinpartieComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._partieService.closeConnection();
-    this.destroyed$.next();
+    this.destroyed$.next(undefined);
     this.equipe1Sub.unsubscribe();
     this.partieSub.unsubscribe();
     this.joueurSub.unsubscribe();

@@ -3,7 +3,6 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Joueur} from '../models/joueur';
-import {stringify} from 'querystring';
 import {Personnage} from '../models/personnage';
 
 

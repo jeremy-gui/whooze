@@ -1,23 +1,24 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+    "strict": false,
+    "ignoreDeprecations": "6.0",
     "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "useDefineForClassFields": false,
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "importHelpers": true,
-    "target": "es2015",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
     "lib": [
-      "es2018",
+      "es2022",
       "dom"
     ]
   },
   "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
   }
 }

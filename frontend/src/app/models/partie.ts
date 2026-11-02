@@ -1,4 +1,3 @@
-import {EnumValue} from '@angular/compiler-cli/src/ngtsc/partial_evaluator';
 
 export enum StadePartieEnCours {
   CREATE_TEAMS = 'CREATE_TEAMS',

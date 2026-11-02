@@ -9,9 +9,9 @@
       </ul>
     </div>
     <div class="col text-center justify-content-center">
-      <div class="row"><button type="button" (click)="GoToTeam1()" class="btn btn-primary btn-block btn-info text-white w-50 mb-5">Go to team 1</button></div>
-      <div class="row"><button type="button" (click)="GoToTeam2()" class="btn btn-primary btn-block btn-warning text-white w-50 mb-5">Go to team 2</button></div>
-      <div class="row"><button *ngIf="this.partie.owner_id === this.account.id" type="button" (click)="StartGame()" class="btn btn-primary btn-block btn-primary text-white w-50 ">Start Game</button></div>
+      <div class="row"><button type="button" (click)="GoToTeam1()" class="btn btn-primary w-100 btn-info text-white w-50 mb-5">Go to team 1</button></div>
+      <div class="row"><button type="button" (click)="GoToTeam2()" class="btn btn-primary w-100 btn-warning text-white w-50 mb-5">Go to team 2</button></div>
+      <div class="row"><button *ngIf="this.partie.owner_id === this.account.id" type="button" (click)="StartGame()" class="btn btn-primary w-100 btn-primary text-white w-50 ">Start Game</button></div>
     </div>
     <div class="col team-2">
       <h3 class="text-warning ">Team 2</h3>

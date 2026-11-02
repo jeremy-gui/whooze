@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ReactiveFormsModule, FormsModule, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {GlobalService} from '../services/global.service';
 import {UserService} from '../services/user.service';
@@ -10,6 +10,8 @@ import {Subscription} from 'rxjs';
 import {Partie} from '../models/partie';
 
 @Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-chooseusername',
   templateUrl: './chooseusername.component.html',
   styleUrls: ['./chooseusername.component.css']

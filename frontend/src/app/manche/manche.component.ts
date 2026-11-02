@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {User} from '../models/user';
 import {Subject, Subscription} from 'rxjs';
 import {Joueur} from '../models/joueur';
@@ -12,6 +12,8 @@ import {takeUntil} from 'rxjs/operators';
 import {MancheService} from '../services/manche.service';
 
 @Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-manche',
   templateUrl: './manche.component.html',
   styleUrls: ['./manche.component.scss']
@@ -542,7 +544,7 @@ export class MancheComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this._partieService.closeConnection();
-    this.destroyed$.next();
+    this.destroyed$.next(undefined);
     this.equipe1Sub.unsubscribe();
     this.partieSub.unsubscribe();
     this.joueurSub.unsubscribe();

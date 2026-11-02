@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {GlobalService, JoueurService, UserService} from '../../services/services.index';
 import {NavigationEnd, Router} from '@angular/router';
 import {User} from '../../models/user';
@@ -11,6 +11,8 @@ import {EquipeService} from '../../services/services.index';
 import {Equipe} from '../../models/equipe';
 
 @Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']

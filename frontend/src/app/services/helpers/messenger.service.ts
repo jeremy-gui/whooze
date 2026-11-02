@@ -7,7 +7,7 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
 export class MessengerService {
   private message: string;
   private type: any;
-  private Toast = Swal.mixin();
+  private Toast = Swal.mixin({});
 
   constructor() {
     // Configuracion del Toast

@@ -4,7 +4,7 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import {Joueur} from '../models/joueur';
 import {environment} from '../../environments/environment';
 import {Partie} from '../models/partie';
-import {delay, filter, mergeMap, retryWhen, switchMap} from 'rxjs/operators';
+import {filter, retry, switchMap} from 'rxjs/operators';
 import {JoueurService} from './joueur.service';
 import { map } from 'rxjs/operators';
 import {webSocket, WebSocketSubject} from 'rxjs/webSocket';
@@ -43,7 +43,7 @@ export class PartieService {
           return this.connection$;
         }
       }),
-      retryWhen((errors) => errors.pipe(delay(this.RETRY_SECONDS)))
+      retry({delay: this.RETRY_SECONDS})
     );
   }
   closeConnection() {

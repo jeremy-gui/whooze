@@ -11,7 +11,7 @@
         <div *ngIf="f.username.errors.minlength">Username must be at least 3 characters</div>
         <div *ngIf="f.username.errors.maxlength">Username must be a maximum of 20 characters</div>
       </div>-->
-    <input  type="text" placeholder="Code" formControlName="gamecode" class="justify-content-center  form-control mb-4 w-50 ml-auto mr-auto" [ngClass]="{ 'is-invalid': submitted && f.gamecode.errors }" />
+    <input  type="text" placeholder="Code" formControlName="gamecode" class="justify-content-center  form-control mb-4 w-50 ms-auto me-auto" [ngClass]="{ 'is-invalid': submitted && f.gamecode.errors }" />
 
     <div *ngIf="submitted && f.gamecode.errors" class="invalid-feedback mb-4">
       <div *ngIf="f.gamecode.errors.required">A game code is required</div>

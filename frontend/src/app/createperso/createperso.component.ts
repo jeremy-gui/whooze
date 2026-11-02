@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {User} from '../models/user';
 import {BehaviorSubject, Subject, Subscription} from 'rxjs';
@@ -12,7 +12,6 @@ import {JoueurService} from '../services/joueur.service';
 import {PartieService} from '../services/partie.service';
 import {EquipeService} from '../services/equipe.service';
 import {Router} from '@angular/router';
-import {Message} from '@angular/compiler/src/i18n/i18n_ast';
 import {environment} from '../../environments/environment';
 import {HttpHeaders} from '@angular/common/http';
 import {takeUntil} from 'rxjs/operators';
@@ -20,6 +19,8 @@ import {Personnage} from '../models/personnage';
 import {PersonnageService} from '../services/personnage.service';
 
 @Component({
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-createperso',
   templateUrl: './createperso.component.html',
   styleUrls: ['./createperso.component.scss']
@@ -50,7 +51,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
 
   ready: boolean = false;
   erreurNbr: boolean = false;
-  messages: Message[] = [];
+  messages: any[] = [];
   msgCtrl = new FormControl('');
   destroyed$ = new Subject();
   messageErreur: string = '';
@@ -333,7 +334,7 @@ export class CreatepersoComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._partieService.closeConnection();
-    this.destroyed$.next();
+    this.destroyed$.next(undefined);
     this.equipe1Sub.unsubscribe();
     this.partieSub.unsubscribe();
     this.joueurSub.unsubscribe();

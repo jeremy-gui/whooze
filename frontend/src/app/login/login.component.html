@@ -4,21 +4,21 @@
     <div class="col-sm-12 text-center text-danger">
       <span *ngIf="loginForm.hasError('NoEmailorPasswordmatch')">Wrong email and/or password<br /></span>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <input type="text" class="form-control" placeholder="Email" formControlName="email">
       <span *ngIf="loginForm.get('email').hasError('required') && loginForm.get('email').touched" class="invalid-feedback text-center"><br />
                    Email is required</span>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <input type="password" class="form-control" placeholder="Password" formControlName="password">
       <span *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched" class="invalid-feedback text-center"><br />
                     Password is required</span>
     </div>
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary btn-block btn-login" [disabled]="loginForm.invalid || loading">Login</button>
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary w-100 btn-login" [disabled]="loginForm.invalid || loading">Login</button>
     </div>
-    <div class="form-group text-center">
-      <small><a href="#" data-toggle="modal" data-target="#modalPassword">Forgot password?</a></small>
+    <div class="mb-3 text-center">
+      <small><a href="#" data-bs-toggle="modal" data-bs-target="#modalPassword">Forgot password?</a></small>
     </div>
 
   </form>
