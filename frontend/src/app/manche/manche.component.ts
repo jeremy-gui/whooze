@@ -19,7 +19,7 @@ import {MancheService} from '../services/manche.service';
   styleUrls: ['./manche.component.scss']
 })
 export class MancheComponent implements OnInit, OnDestroy {
-  equipeEnCours: Equipe;
+  equipeEnCours: Equipe = new Equipe();
   equipeEnCoursSub: Subscription;
   myteam: number;
   aQuiDeJouer: Joueur = new Joueur();
